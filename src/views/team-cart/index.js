@@ -1,5 +1,22 @@
-import { Grid, Box, Stack, Typography, Button } from '@mui/material';
+import {
+    Grid,
+    Box,
+    Stack,
+    Typography,
+    Button,
+    IconButton,
+    OutlinedInput,
+    Divider,
+    Accordion as MuiAccordion,
+    AccordionSummary as MuiAccordionSummary,
+    AccordionDetails as MuiAccordionDetails,
+    TextField
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/AddBox';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { styled } from '@mui/material/styles';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -411,6 +428,57 @@ const TeamCart = () => {
         ]
     };
 
+    const cart = {
+        owners: [
+            {
+                name: 'Han',
+                items: [
+                    {
+                        name: 'Bun dau 1'
+                    },
+                    {
+                        name: 'Bun dau 1'
+                    }
+                ]
+            },
+            {
+                name: 'Hoa',
+                items: [
+                    {
+                        name: 'Bun dau 1'
+                    }
+                ]
+            },
+            {
+                name: 'Hai',
+                items: [
+                    {
+                        name: 'Bun dau 1'
+                    }
+                ]
+            }
+        ]
+    };
+
+    const Accordion = styled((props) => <MuiAccordion disableGutters elevation={0} square {...props} />)(() => ({
+        // margin: '2px 0',
+        '&:not(:last-child)': {
+            borderBottom: 0
+        },
+        '&:before': {
+            display: 'none'
+        }
+    }));
+
+    const AccordionSummary = styled((props) => <MuiAccordionSummary {...props} />)(({ theme }) => ({
+        backgroundColor: 'gainsboro'
+    }));
+
+    const AccordionDetails = styled(MuiAccordionDetails)(() => ({
+        padding: 0
+        // borderTop: '1px solid rgba(0, 0, 0, .125)'
+    }));
+
     return (
         <Grid container spacing={2}>
             <Wrapper item lg={12}>
@@ -426,15 +494,15 @@ const TeamCart = () => {
                 </Box>
             </Wrapper>
             <Grid item lg={9} container spacing={1}>
-                {shop.sections.map((section) => (
-                    <Grid key={section} item container spacing={1} mb={2} lg={12}>
+                {shop.sections.map((section, sectionIndex) => (
+                    <Grid key={sectionIndex} item container spacing={1} mb={2} lg={12}>
                         <Wrapper item lg={12}>
                             <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
                                 {section.name}
                             </Typography>
                         </Wrapper>
-                        {section.items.map((item) => (
-                            <Wrapper key={item} item lg={6}>
+                        {section.items.map((item, itemIndex) => (
+                            <Wrapper key={itemIndex} item lg={6}>
                                 <Grid container sx={{ height: 150 }}>
                                     <Grid item xs={3} display="flex" alignItems="center" justifyContent="center">
                                         <img width={140} src={item.imageUrl} alt={item.name} />
@@ -455,7 +523,7 @@ const TeamCart = () => {
                                             <Grid item>
                                                 <Button
                                                     variant="contained"
-                                                    color="warning"
+                                                    color="primary"
                                                     startIcon={<AddIcon />}
                                                     disabled={!item.isAvailable}
                                                 >
@@ -470,9 +538,124 @@ const TeamCart = () => {
                     </Grid>
                 ))}
             </Grid>
-            <Grid item lg={3}>
-                Bill Here
-            </Grid>
+            <Wrapper item lg={3} p={0}>
+                <Stack>
+                    <Box>
+                        <Box border="1px solid gainsboro">
+                            <Box bgcolor="gainsboro" py={1.5}>
+                                <Typography variant="h5" textAlign="center">
+                                    Dat hang
+                                </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" justifyContent="space-between" px={1} pr={0}>
+                                <Typography variant="body1" fontSize={15} component="div">
+                                    Bun dau
+                                </Typography>
+                                <Box display="flex" alignItems="center">
+                                    <IconButton color="primary">
+                                        <AddCircleIcon fontSize="small" />
+                                    </IconButton>
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        0
+                                    </Typography>
+                                    <IconButton color="primary">
+                                        <RemoveCircleIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                <Typography variant="h6" fontSize={15} component="div">
+                                    Tong
+                                </Typography>
+                                <Typography variant="h6" fontSize={15} component="div">
+                                    20000
+                                </Typography>
+                            </Box>
+                            <TextField fullWidth variant="filled" label="Note" />
+                            <Button fullWidth variant="contained" color="info">
+                                Xac nhan
+                            </Button>
+                        </Box>
+                    </Box>
+
+                    <Box bgcolor="red" py={1.5}>
+                        <Typography variant="h5" textAlign="center">
+                            Chi tiet
+                        </Typography>
+                    </Box>
+                    {cart.owners.map((owner, ownerIndex) => (
+                        <Accordion key={ownerIndex} expanded>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                <Typography variant="h5">{owner.name}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ border: '1px solid gainsboro', borderTop: 'none' }}>
+                                {owner.items.map((item, itemIndex) => (
+                                    <Box key={itemIndex} display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                        <Typography variant="body1" fontSize={15} component="div">
+                                            2 - {item.name}
+                                        </Typography>
+                                        <Typography variant="body1" fontSize={15} component="div">
+                                            20000
+                                        </Typography>
+                                    </Box>
+                                ))}
+                                <Divider />
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="blue">
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        Tong
+                                    </Typography>
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        20000
+                                    </Typography>
+                                </Box>
+                                <Divider />
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="red">
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        Note
+                                    </Typography>
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        20000
+                                    </Typography>
+                                </Box>
+                            </AccordionDetails>
+                        </Accordion>
+                    ))}
+                    <Box border="1px solid gainsboro" borderRadius={2} my={1}>
+                        <Box bgcolor="gainsboro" py={1.5}>
+                            <Typography variant="h5" textAlign="center">
+                                Sao ke
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                            <Typography variant="body1" fontSize={15} component="div">
+                                Giam gia
+                            </Typography>
+                            <Typography variant="body1" fontSize={15} component="div">
+                                20000
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                            <Typography variant="body1" fontSize={15} component="div">
+                                20000
+                            </Typography>
+                            <Typography variant="body1" fontSize={15} component="div">
+                                20000
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                            <Typography variant="h6" fontSize={15} component="div">
+                                Tong
+                            </Typography>
+                            <Typography variant="h6" fontSize={15} component="div">
+                                20000
+                            </Typography>
+                        </Box>
+                        <Button fullWidth variant="contained" color="info">
+                            Chot don
+                        </Button>
+                    </Box>
+                </Stack>
+            </Wrapper>
         </Grid>
     );
 };
