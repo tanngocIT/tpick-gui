@@ -1,6 +1,11 @@
-import { Grid, Card, Box, Paper, Stack, Typography } from '@mui/material';
-import MainCard from 'ui-component/cards/MainCard';
-import { styled } from '@mui/material/styles';
+import { Grid, Box, Stack, Typography, Button } from '@mui/material';
+import AddIcon from '@mui/icons-material/AddBox';
+
+const Wrapper = ({ children, ...rest }) => (
+    <Grid {...rest}>
+        <Box sx={{ padding: 1, bgcolor: '#ffffff', borderRadius: 1 }}>{children}</Box>
+    </Grid>
+);
 
 const TeamCart = () => {
     const shop = {
@@ -406,38 +411,66 @@ const TeamCart = () => {
         ]
     };
 
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.secondary
-    }));
-
     return (
         <Grid container spacing={2}>
-            <Grid item>
-                <MainCard title="ddfd">
-                    <Typography variant="body2">
-                        Lorem ipsum dolor sit amen, consenter nipissing eli, sed do elusion tempos incident ut laborers et doolie magna
-                        alissa. Ut enif ad minim venice, quin nostrum exercitation illampu laborings nisi ut liquid ex ea commons construal.
-                        Duos aube grue dolor in reprehended in voltage veil esse colum doolie eu fujian bulla parian. Exceptive sin ocean
-                        cuspidate non president, sunk in culpa qui officiate descent molls anim id est labours.
-                    </Typography>
-                </MainCard>
-            </Grid>
-            <Grid item xs={8} container spacing={2}>
-                {shop.sections.map((section, i) => (
-                    <Grid key={i} item xs={12}>
-                        <Item>
-                            <Typography variant="subtitle1" component="div">
+            <Wrapper item lg={12}>
+                <Box display="flex" p={1}>
+                    <Stack p={1} spacing={1}>
+                        <Typography variant="h2" fontSize={20} component="div">
+                            {shop.name}
+                        </Typography>
+                        <Typography variant="body1" fontSize={18} component="div">
+                            {shop.address}
+                        </Typography>
+                    </Stack>
+                </Box>
+            </Wrapper>
+            <Grid item lg={9} container spacing={1}>
+                {shop.sections.map((section) => (
+                    <Grid key={section} item container spacing={1} mb={2} lg={12}>
+                        <Wrapper item lg={12}>
+                            <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
                                 {section.name}
                             </Typography>
-                        </Item>
+                        </Wrapper>
+                        {section.items.map((item) => (
+                            <Wrapper key={item} item lg={6}>
+                                <Grid container sx={{ height: 150 }}>
+                                    <Grid item xs={3} display="flex" alignItems="center" justifyContent="center">
+                                        <img width={140} src={item.imageUrl} alt={item.name} />
+                                    </Grid>
+                                    <Grid item xs={9} display="flex" flexDirection="column" justifyContent="space-between" p={1}>
+                                        <Typography variant="subtitle1" fontSize={16} component="div">
+                                            {item.name}
+                                        </Typography>
+                                        <Typography variant="caption" fontSize={15} component="div">
+                                            {item.description}
+                                        </Typography>
+                                        <Grid container display="flex" alignItems="center" justifyContent="space-between" spacing={1}>
+                                            <Grid item>
+                                                <Typography variant="overline" fontSize={15} component="div">
+                                                    {item.price.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item>
+                                                <Button
+                                                    variant="contained"
+                                                    color="warning"
+                                                    startIcon={<AddIcon />}
+                                                    disabled={!item.isAvailable}
+                                                >
+                                                    Thêm
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Wrapper>
+                        ))}
                     </Grid>
                 ))}
             </Grid>
-            <Grid item xs={4}>
+            <Grid item lg={3}>
                 Bill Here
             </Grid>
         </Grid>
