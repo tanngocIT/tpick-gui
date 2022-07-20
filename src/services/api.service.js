@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
 axios.defaults.baseURL = process.env.REACT_APP_BASE_API;
