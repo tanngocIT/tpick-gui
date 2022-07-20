@@ -11,6 +11,7 @@ import themes from 'themes';
 
 // project imports
 import NavigationScroll from 'layout/NavigationScroll';
+import AuthGuard from 'layout/AuthGuard';
 
 // ==============================|| APP ||============================== //
 
@@ -23,6 +24,7 @@ const App = () => {
                 <CssBaseline />
                 <NavigationScroll>
                     <Routes />
+                    <AuthGuard />
                 </NavigationScroll>
             </ThemeProvider>
         </StyledEngineProvider>

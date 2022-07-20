@@ -5,7 +5,6 @@ import {
     Typography,
     Button,
     IconButton,
-    OutlinedInput,
     Divider,
     Accordion as MuiAccordion,
     AccordionSummary as MuiAccordionSummary,
@@ -470,7 +469,7 @@ const TeamCart = () => {
         }
     }));
 
-    const AccordionSummary = styled((props) => <MuiAccordionSummary {...props} />)(({ theme }) => ({
+    const AccordionSummary = styled((props) => <MuiAccordionSummary {...props} />)(() => ({
         backgroundColor: 'gainsboro'
     }));
 
