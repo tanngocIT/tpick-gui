@@ -19,6 +19,7 @@ import { styled } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { getOrderDetails, getShopDetails } from 'services/main.service';
+import { useSelector } from 'react-redux';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -28,17 +29,54 @@ const Wrapper = ({ children, ...rest }) => (
 
 const TeamCart = () => {
     const { orderId } = useParams();
+    const user = useSelector((x) => x.auth.user);
     const [order, setOrder] = useState({});
     const [shop, setShop] = useState({});
+    const [mySubOrder, setMySubOrder] = useState({ owner: user, items: [], isConfirm: false });
+
+    const addItem = (item) => {
+        const existingItem = mySubOrder.items.find((x) => x.name === item.name);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            mySubOrder.items.push({ ...item, quantity: 1 });
+        }
+
+        setMySubOrder({ ...mySubOrder });
+    };
+
+    const subItem = (item) => {
+        const existingItem = mySubOrder.items.find((x) => x.name === item.name);
+        if (!existingItem) return;
+
+        existingItem.quantity -= 1;
+        if (existingItem.quantity <= 0) {
+            mySubOrder.items = mySubOrder.items.filter((x) => x.name !== item.name);
+        }
+
+        setMySubOrder({ ...mySubOrder });
+    };
 
     useEffect(() => {
-        if (!orderId) return;
-
         const fetchOrderDetails = async () => {
             const order = await getOrderDetails(orderId);
             setOrder(order);
         };
         fetchOrderDetails();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        const fetchOrderDetails = async () => {
+            const order = await getOrderDetails(orderId);
+            setOrder(order);
+        };
+
+        const interval = setInterval(fetchOrderDetails, 10000);
+
+        return () => {
+            clearInterval(interval);
+        };
     }, [orderId]);
 
     useEffect(() => {
@@ -51,13 +89,7 @@ const TeamCart = () => {
         fetchShopDetails();
     }, [order.shopId]);
 
-    // const fetchOrderDetails = async () => {
-    //     const order = await getOrderDetails(orderId);
-    //     setOrder(order);
-    // };
-
     const Accordion = styled((props) => <MuiAccordion disableGutters elevation={0} square {...props} />)(() => ({
-        // margin: '2px 0',
         '&:not(:last-child)': {
             borderBottom: 0
         },
@@ -72,7 +104,6 @@ const TeamCart = () => {
 
     const AccordionDetails = styled(MuiAccordionDetails)(() => ({
         padding: 0
-        // borderTop: '1px solid rgba(0, 0, 0, .125)'
     }));
 
     return (
@@ -90,15 +121,15 @@ const TeamCart = () => {
                 </Box>
             </Wrapper>
             <Grid item lg={9} container spacing={1}>
-                {shop.sections?.map((section, sectionIndex) => (
-                    <Grid key={sectionIndex} item container spacing={1} mb={2} lg={12}>
+                {shop.sections?.map((section) => (
+                    <Grid key={section.name} item container spacing={1} mb={2} lg={12}>
                         <Wrapper item lg={12}>
                             <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
                                 {section.name}
                             </Typography>
                         </Wrapper>
-                        {section.items?.map((item, itemIndex) => (
-                            <Wrapper key={itemIndex} item lg={6}>
+                        {section.items?.map((item) => (
+                            <Wrapper key={item.name} item lg={6}>
                                 <Grid container sx={{ height: 150 }}>
                                     <Grid item xs={3} display="flex" alignItems="center" justifyContent="center">
                                         <img width={140} src={item.imageUrl} alt={item.name} />
@@ -122,6 +153,7 @@ const TeamCart = () => {
                                                     color="primary"
                                                     startIcon={<AddIcon />}
                                                     disabled={!item.isAvailable}
+                                                    onClick={() => addItem(item)}
                                                 >
                                                     Thêm
                                                 </Button>
@@ -143,28 +175,30 @@ const TeamCart = () => {
                                     Dat hang
                                 </Typography>
                             </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" px={1} pr={0}>
-                                <Typography variant="body1" fontSize={15} component="div">
-                                    Bun dau
-                                </Typography>
-                                <Box display="flex" alignItems="center">
-                                    <IconButton color="primary">
-                                        <AddCircleIcon fontSize="small" />
-                                    </IconButton>
+                            {mySubOrder.items.map((item) => (
+                                <Box key={item.name} display="flex" alignItems="center" justifyContent="space-between" px={1} pr={0}>
                                     <Typography variant="body1" fontSize={15} component="div">
-                                        0
+                                        {item.name}
                                     </Typography>
-                                    <IconButton color="primary">
-                                        <RemoveCircleIcon fontSize="small" />
-                                    </IconButton>
+                                    <Box display="flex" alignItems="center">
+                                        <IconButton color="primary" onClick={() => addItem(item)}>
+                                            <AddCircleIcon fontSize="small" />
+                                        </IconButton>
+                                        <Typography variant="body1" fontSize={15} component="div">
+                                            {item.quantity}
+                                        </Typography>
+                                        <IconButton color="primary" onClick={() => subItem(item)}>
+                                            <RemoveCircleIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
                                 </Box>
-                            </Box>
+                            ))}
                             <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                                 <Typography variant="h6" fontSize={15} component="div">
                                     Tong
                                 </Typography>
                                 <Typography variant="h6" fontSize={15} component="div">
-                                    20000
+                                    {mySubOrder.items.reduce((acc, item) => acc + item.quantity * item.price, 0)}
                                 </Typography>
                             </Box>
                             <TextField fullWidth variant="filled" label="Note" />
@@ -174,19 +208,19 @@ const TeamCart = () => {
                         </Box>
                     </Box>
 
-                    <Box bgcolor="red" py={1.5}>
+                    <Box bgcolor="red" py={1.5} mt={1}>
                         <Typography variant="h5" textAlign="center">
                             Chi tiet
                         </Typography>
                     </Box>
-                    {order.subOrders?.map((subOrder, ownerIndex) => (
-                        <Accordion key={ownerIndex} expanded>
+                    {order.subOrders?.map((subOrder) => (
+                        <Accordion key={subOrder.owner} expanded>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                 <Typography variant="h5">{subOrder.name}</Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ border: '1px solid gainsboro', borderTop: 'none' }}>
-                                {subOrder.items?.map((item, itemIndex) => (
-                                    <Box key={itemIndex} display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                {subOrder.items?.map((item) => (
+                                    <Box key={item.name} display="flex" alignItems="center" justifyContent="space-between" p={1}>
                                         <Typography variant="body1" fontSize={15} component="div">
                                             2 - {item.name}
                                         </Typography>
