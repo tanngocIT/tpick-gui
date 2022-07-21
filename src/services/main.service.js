@@ -1,4 +1,4 @@
-import { get, is2xxCode, post } from './api.service';
+import { get, is2xxCode, post, del } from './api.service';
 
 export const addOrUpdateShop = async (shopUrl) => {
     const { status, data } = await post(`/shops`, { shopUrl });
@@ -23,6 +23,20 @@ export const initOrder = async (shopId, host) => {
 
 export const getOrderDetails = async (id) => {
     const { status, data } = await get(`/orders/${id}`);
+    if (is2xxCode(status)) return data;
+
+    throw new Error('Something went wrong!');
+};
+
+export const submitSubOrder = async (orderId, subOrder) => {
+    const { status, data } = await post(`/orders/${orderId}/sub-orders`, subOrder);
+    if (is2xxCode(status)) return data;
+
+    throw new Error('Something went wrong!');
+};
+
+export const removeSubOrder = async (orderId, ownerId) => {
+    const { status, data } = await del(`/orders/${orderId}/sub-orders/${ownerId}`);
     if (is2xxCode(status)) return data;
 
     throw new Error('Something went wrong!');
