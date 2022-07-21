@@ -55,7 +55,7 @@ const TeamCart = () => {
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
     const [shop, setShop] = useState({ sections: [] });
-    const [mySubOrder, setMySubOrder] = useState({ owner: user, items: [], using: false, confirmed: false });
+    const [mySubOrder, setMySubOrder] = useState({ owner: null, items: [], using: false, confirmed: false });
 
     const isHost = () => user.id === order.host?.id;
 
@@ -133,6 +133,13 @@ const TeamCart = () => {
         const shop = await mainService.getShopDetails(order.shopId);
         setShop(shop);
     }, [order?.shopId]);
+
+    useEffect(() => {
+        if (!user) return;
+
+        setMySubOrder({ ...mySubOrder, owner: user });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
     useEffect(() => {
         fetchOrderDetails();
