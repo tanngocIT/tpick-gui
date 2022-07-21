@@ -21,7 +21,7 @@ import { useParams } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as mainService from 'services/main.service';
-import { toLocalePrice, sum } from 'utils/pricing-tool';
+import { sum } from 'utils/pricing-tool';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
