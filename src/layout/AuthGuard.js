@@ -40,7 +40,8 @@ const AuthGuard = () => {
         }
     };
 
-    const handleClick = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
         if (!name) return;
 
         const user = {
@@ -53,21 +54,23 @@ const AuthGuard = () => {
     return (
         <div>
             <Modal open={open} onClose={handleClose}>
-                <Paper sx={style}>
-                    <Stack>
-                        <TextField
-                            variant="outlined"
-                            label="Input your name"
-                            placeholder="Input your name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        <br />
-                        <Button variant="contained" onClick={handleClick}>
-                            Submit
-                        </Button>
-                    </Stack>
-                </Paper>
+                <form onSubmit={handleSubmit}>
+                    <Paper sx={style}>
+                        <Stack>
+                            <TextField
+                                variant="outlined"
+                                label="Name"
+                                placeholder="Nhập tên của bạn"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <br />
+                            <Button variant="contained" type="submit">
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Paper>
+                </form>
             </Modal>
         </div>
     );

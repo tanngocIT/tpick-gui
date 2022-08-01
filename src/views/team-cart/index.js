@@ -21,7 +21,7 @@ import { useParams } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as mainService from 'services/main.service';
-import { sum } from 'utils/pricing-tool';
+import { sum, toLocalePrice } from 'utils/pricing-tool';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -198,7 +198,7 @@ const TeamCart = () => {
                                         <Grid container display="flex" alignItems="center" justifyContent="space-between" spacing={1}>
                                             <Grid item>
                                                 <Typography variant="overline" fontSize={15} component="div">
-                                                    {item.price.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}
+                                                    {toLocalePrice(item.price)}
                                                 </Typography>
                                             </Grid>
                                             <Grid item>
@@ -226,7 +226,7 @@ const TeamCart = () => {
                         <Box border="0px solid gainsboro" bgcolor="#f7f7f7" my={0.5}>
                             <Box bgcolor="gainsboro" py={1.5}>
                                 <Typography variant="h5" textAlign="center">
-                                    Dat hang
+                                    {`Đặt hàng của ${user.name}`}
                                 </Typography>
                             </Box>
                             {mySubOrder.items.map((item) => (
@@ -249,10 +249,13 @@ const TeamCart = () => {
                             ))}
                             <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                                 <Typography variant="h6" fontSize={15} component="div">
-                                    Tong
+                                    Tổng
                                 </Typography>
                                 <Typography variant="h6" fontSize={15} component="div">
-                                    {sum(mySubOrder.items, (x) => x.quantity * x.price)}
+                                    {toLocalePrice(
+                                        sum(mySubOrder.items, (x) => x.quantity * x.price),
+                                        false
+                                    )}
                                 </Typography>
                             </Box>
                             <TextField
@@ -294,6 +297,11 @@ const TeamCart = () => {
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                     <Box display="flex" alignItems="center">
                                         <Typography variant="h5">{subOrder.owner.name}</Typography>
+                                        <Typography variant="subtitle1" ml={0.5} color="primary">
+                                            {`${sum(subOrder.items, (x) => x.quantity)} phần - ${toLocalePrice(
+                                                sum(subOrder.items, (x) => x.quantity * x.price)
+                                            )}`}
+                                        </Typography>
                                         {isHost() && (
                                             <IconButton color="error" onClick={() => removeTeamSubOrder(subOrder.owner.id)}>
                                                 <DeleteIcon fontSize="small" />
@@ -308,19 +316,11 @@ const TeamCart = () => {
                                                 {item.quantity} x {item.name}
                                             </Typography>
                                             <Typography variant="body1" fontSize={15} component="div">
-                                                {item.quantity * item.price}
+                                                {toLocalePrice(item.quantity * item.price)}
                                             </Typography>
                                         </Box>
                                     ))}
                                     <Divider />
-                                    <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="blue">
-                                        <Typography variant="body1" fontSize={15} component="div">
-                                            Tong
-                                        </Typography>
-                                        <Typography variant="body1" fontSize={15} component="div">
-                                            {sum(subOrder.items, (x) => x.quantity * x.price)}
-                                        </Typography>
-                                    </Box>
                                     <Divider />
                                     {!!subOrder?.note && (
                                         <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="red">
@@ -340,12 +340,12 @@ const TeamCart = () => {
                     <Box bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
                         <Box bgcolor="gainsboro" py={1.5}>
                             <Typography variant="h5" textAlign="center">
-                                Sao ke
+                                Sao kê
                             </Typography>
                         </Box>
                         <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                             <Typography variant="body1" fontSize={15} component="div">
-                                Giam gia
+                                Giảm giá
                             </Typography>
                             <Typography variant="body1" fontSize={15} component="div">
                                 0
@@ -361,10 +361,12 @@ const TeamCart = () => {
                         </Box>
                         <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                             <Typography variant="h6" fontSize={15} component="div">
-                                Tong
+                                Tổng
                             </Typography>
                             <Typography variant="h6" fontSize={15} component="div">
-                                {sum(order.subOrders, (subOrder) => sum(subOrder.items, (item) => item.price * item.quantity))}
+                                {toLocalePrice(
+                                    sum(order.subOrders, (subOrder) => sum(subOrder.items, (item) => item.price * item.quantity))
+                                )}
                             </Typography>
                         </Box>
                         {isHost() && (

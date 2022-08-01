@@ -1,5 +1,5 @@
-export const toLocalePrice = (price) => {
-    return price.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
+export const toLocalePrice = (price, withSymbol = false) => {
+    return withSymbol ? price.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) : price.toLocaleString('it-IT');
 };
 
 export const sum = (items, calculation) => {
