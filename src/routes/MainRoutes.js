@@ -4,9 +4,9 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
-const TeamCart = Loadable(lazy(() => import('views/team-cart')));
-const InitOrder = Loadable(lazy(() => import('views/init-order')));
-const OrderDetails = Loadable(lazy(() => import('views/order-details')));
+const OrderCart = Loadable(lazy(() => import('views/orders/cart')));
+const OrderInit = Loadable(lazy(() => import('views/orders/init')));
+const OrderDetails = Loadable(lazy(() => import('views/orders/details')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -16,18 +16,18 @@ const MainRoutes = {
     children: [
         {
             path: '/',
-            element: <InitOrder />
+            element: <OrderInit />
         },
         {
-            path: 'init-order',
-            element: <InitOrder />
+            path: 'orders/init',
+            element: <OrderInit />
         },
         {
-            path: 'team-cart/:orderId',
-            element: <TeamCart />
+            path: 'orders/:orderId/cart',
+            element: <OrderCart />
         },
         {
-            path: 'order-details/:orderId',
+            path: 'orders/:orderId/details',
             element: <OrderDetails />
         }
     ]

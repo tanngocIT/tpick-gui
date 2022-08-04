@@ -51,7 +51,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
     borderRadius: 0
 }));
 
-const TeamCart = () => {
+const OrderCart = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
     const user = useSelector((x) => x.auth?.user);
@@ -156,17 +156,19 @@ const TeamCart = () => {
     }, []);
 
     useEffect(() => {
-        if (order.isConfirm)
-            return () => {
-                navigate(`/order-details/${order.id}`);
-            };
-
         const interval = setInterval(fetchOrderDetails, 10000);
 
         return () => {
             clearInterval(interval);
         };
-    }, [navigate, fetchOrderDetails, order.isConfirm, order.id]);
+    }, [fetchOrderDetails]);
+
+    useEffect(() => {
+        if (!order.id) return;
+        if (!order.isConfirm) return;
+
+        navigate(`/orders/${order.id}/details`);
+    }, [navigate, order.id, order.isConfirm]);
 
     useEffect(() => {
         fetchShopDetails();
@@ -200,7 +202,11 @@ const TeamCart = () => {
                             <Wrapper key={item.name} item xs={12} xl={6}>
                                 <Grid container>
                                     <Grid item xs={12} sm={3} md={2} xl={3} display="flex" alignItems="center" justifyContent="center">
-                                        <img style={{ width: '100%', maxWidth: '512px' }} src={item.imageUrl || foodPlaceholder} alt={item.name} />
+                                        <img
+                                            style={{ width: '100%', maxWidth: '512px' }}
+                                            src={item.imageUrl || foodPlaceholder}
+                                            alt={item.name}
+                                        />
                                     </Grid>
                                     <Grid
                                         item
@@ -411,4 +417,4 @@ const TeamCart = () => {
     );
 };
 
-export default TeamCart;
+export default OrderCart;

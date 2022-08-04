@@ -45,6 +45,7 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const navigate = useNavigate();
+    const user = useSelector((state) => state.auth.user);
 
     const [sdm, setSdm] = useState(true);
     const [value, setValue] = useState('');
@@ -75,7 +76,7 @@ const ProfileSection = () => {
         }
     };
     const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
+        // setOpen((prevOpen) => !prevOpen);
     };
 
     const prevOpen = useRef(open);
@@ -123,7 +124,12 @@ const ProfileSection = () => {
                         color="inherit"
                     />
                 }
-                label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+                label={
+                    <Stack direction="row" display="flex">
+                        <h3>{user.name}</h3>
+                        {/* <IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} /> */}
+                    </Stack>
+                }
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}

@@ -22,7 +22,7 @@ const SpinIcon = () => (
     />
 );
 
-const InitOrder = () => {
+const OrderInit = () => {
     const navigate = useNavigate();
     const [shopUrl, setShopUrl] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -43,7 +43,7 @@ const InitOrder = () => {
         try {
             const { id: shopId } = await addOrUpdateShop(shopUrl);
             const { id: orderId } = await initOrder(shopId, user);
-            navigate(`team-cart/${orderId}`);
+            navigate(`orders/${orderId}/cart`);
         } catch (error) {
             // ignore
         } finally {
@@ -91,4 +91,4 @@ const InitOrder = () => {
     );
 };
 
-export default InitOrder;
+export default OrderInit;

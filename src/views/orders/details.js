@@ -43,7 +43,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
     borderRadius: 0
 }));
 
-const TeamCart = () => {
+const OrderDetails = () => {
     const { orderId } = useParams();
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
@@ -244,4 +244,4 @@ const TeamCart = () => {
     );
 };
 
-export default TeamCart;
+export default OrderDetails;
