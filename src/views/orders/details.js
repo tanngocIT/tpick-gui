@@ -115,7 +115,7 @@ const OrderDetails = () => {
                     <Box item lg={6} bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
                         <Box bgcolor="gainsboro" py={1.5}>
                             <Typography variant="h5" textAlign="center">
-                                Thống kê
+                                Sao kê
                             </Typography>
                         </Box>
                         <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
@@ -160,7 +160,7 @@ const OrderDetails = () => {
                     <Box my={0.5}>
                         <Box bgcolor="gainsboro" py={1.5}>
                             <Typography variant="h5" textAlign="center">
-                                Chi tiết theo phần
+                                Theo phần
                             </Typography>
                         </Box>
                         {groupItems.map((groupItem) => (
@@ -196,7 +196,7 @@ const OrderDetails = () => {
                     <Box bgcolor="#f7f7f7" my={0.5}>
                         <Box bgcolor="gainsboro" py={1.5}>
                             <Typography variant="h5" textAlign="center">
-                                Chi tiết theo người
+                                Theo người
                             </Typography>
                         </Box>
                         {order.subOrders?.map((subOrder) => (
