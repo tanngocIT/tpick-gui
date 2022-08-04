@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 
 // third party
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 // project imports
@@ -17,9 +17,9 @@ import config from './config';
 
 ReactDOM.render(
     <Provider store={store}>
-        <BrowserRouter basename={config.basename}>
+        <HashRouter basename={config.basename}>
             <App />
-        </BrowserRouter>
+        </HashRouter>
     </Provider>,
     document.getElementById('root')
 );
