@@ -43,7 +43,7 @@
             }
         ],
         "prettier/prettier": [
-            2,
+            0,
             {
                 "bracketSpacing": true,
                 "printWidth": 140,

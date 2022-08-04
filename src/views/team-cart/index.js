@@ -17,11 +17,12 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import * as mainService from 'services/main.service';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
+import foodPlaceholder from 'assets/images/food-placeholder.png';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -52,6 +53,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
 
 const TeamCart = () => {
     const { orderId } = useParams();
+    const navigate = useNavigate();
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
     const [shop, setShop] = useState({ sections: [] });
@@ -135,8 +137,11 @@ const TeamCart = () => {
     }, [order?.shopId]);
 
     const handleConfirmOrder = useCallback(async () => {
+        if (order.subOrders.length === 0) return;
+
         await mainService.confirmOrder(order.id);
-    }, [order.id]);
+        await fetchOrderDetails();
+    }, [order, fetchOrderDetails]);
 
     useEffect(() => {
         if (!user) return;
@@ -151,14 +156,17 @@ const TeamCart = () => {
     }, []);
 
     useEffect(() => {
-        if (order.isConfirm) return () => {};
+        if (order.isConfirm)
+            return () => {
+                navigate(`/order-details/${order.id}`);
+            };
 
         const interval = setInterval(fetchOrderDetails, 10000);
 
         return () => {
             clearInterval(interval);
         };
-    }, [fetchOrderDetails, order.isConfirm]);
+    }, [navigate, fetchOrderDetails, order.isConfirm, order.id]);
 
     useEffect(() => {
         fetchShopDetails();
@@ -168,7 +176,7 @@ const TeamCart = () => {
 
     return (
         <Grid container spacing={2}>
-            <Wrapper item lg={12}>
+            <Wrapper item xs={12}>
                 <Box display="flex" p={1}>
                     <Stack p={1} spacing={1}>
                         <Typography variant="h2" fontSize={20} component="div">
@@ -180,21 +188,31 @@ const TeamCart = () => {
                     </Stack>
                 </Box>
             </Wrapper>
-            <Grid item lg={9} container spacing={1}>
+            <Grid item xs={12} lg={9} container spacing={1}>
                 {shop.sections?.map((section) => (
-                    <Grid key={section.name} item container spacing={1} mb={2} lg={12}>
-                        <Wrapper item lg={12}>
+                    <Grid key={section.name} item container spacing={1} mb={2}>
+                        <Wrapper item xs={12}>
                             <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
                                 {section.name}
                             </Typography>
                         </Wrapper>
                         {section.items?.map((item) => (
-                            <Wrapper key={item.name} item lg={6}>
-                                <Grid container sx={{ height: 150 }}>
-                                    <Grid item xs={3} display="flex" alignItems="center" justifyContent="center">
-                                        <img width={140} src={item.imageUrl} alt={item.name} />
+                            <Wrapper key={item.name} item xs={12} xl={6}>
+                                <Grid container>
+                                    <Grid item xs={12} sm={3} md={2} xl={3} display="flex" alignItems="center" justifyContent="center">
+                                        <img style={{ width: '100%', maxWidth: '512px' }} src={item.imageUrl || foodPlaceholder} alt={item.name} />
                                     </Grid>
-                                    <Grid item xs={9} display="flex" flexDirection="column" justifyContent="space-between" p={1}>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        sm={9}
+                                        md={10}
+                                        xl={9}
+                                        display="flex"
+                                        flexDirection="column"
+                                        justifyContent="space-between"
+                                        p={1}
+                                    >
                                         <Typography variant="subtitle1" fontSize={16} component="div">
                                             {item.name}
                                         </Typography>
@@ -226,7 +244,7 @@ const TeamCart = () => {
                     </Grid>
                 ))}
             </Grid>
-            <Wrapper item lg={3}>
+            <Wrapper item xs={12} lg={3}>
                 <Stack>
                     {mySubOrder.items.length > 0 && (
                         <Box border="0px solid gainsboro" bgcolor="#f7f7f7" my={0.5}>
@@ -299,7 +317,7 @@ const TeamCart = () => {
                             </Typography>
                         </Box>
                         {order.subOrders?.map((subOrder) => (
-                            <Accordion key={subOrder.owner}>
+                            <Accordion key={subOrder.owner.id}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                     <Box display="flex" alignItems="center">
                                         <Typography variant="h5">{subOrder.owner.name}</Typography>
@@ -376,7 +394,13 @@ const TeamCart = () => {
                             </Typography>
                         </Box>
                         {isHost() && (
-                            <Button fullWidth variant="contained" color="info" onClick={handleConfirmOrder}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                color="info"
+                                onClick={handleConfirmOrder}
+                                disabled={order?.subOrders?.length === 0}
+                            >
                                 Chốt đơn
                             </Button>
                         )}

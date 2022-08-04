@@ -53,18 +53,19 @@ const InitOrder = () => {
 
     return (
         <Paper>
-            <Grid container p={2} rowSpacing={1}>
-                <Grid item xs={12}>
-                    <Typography variant="h2" fontSize={20} component="div">
+            <Grid m={1} p={1}>
+                <Grid item xs={12} py={1}>
+                    <Typography textAlign="center" variant="h3" fontSize={20} component="h1" color="primary">
                         Chào mừng đến với TPick, nhập đường dẫn ShopeeFood để bắt đầu đặt nhóm!
                     </Typography>
                 </Grid>
-                <Grid item container xs={12} display="flex" spacing={1} alignItems="center">
-                    <Grid item xs={9}>
+                <Grid item xs={12} py={1}>
+                    <Grid item xs={12} py={1}>
                         <TextField
+                            autoComplete="off"
                             variant="outlined"
-                            label="Duong dan"
-                            placeholder="Nhap duong dan..."
+                            label="Đường dẫn"
+                            placeholder="Nhập đường dẫn..."
                             fullWidth
                             focused
                             disabled={processing}
@@ -72,8 +73,9 @@ const InitOrder = () => {
                             onChange={(e) => setShopUrl(e.target.value)}
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={12}>
                         <Button
+                            fullWidth
                             variant="contained"
                             color="primary"
                             disabled={processing}

@@ -59,7 +59,8 @@ const AuthGuard = () => {
                         <Stack>
                             <TextField
                                 variant="outlined"
-                                label="Name"
+                                autoComplete="off"
+                                label="Tên"
                                 placeholder="Nhập tên của bạn"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
