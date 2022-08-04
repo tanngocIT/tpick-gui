@@ -134,6 +134,10 @@ const TeamCart = () => {
         setShop(shop);
     }, [order?.shopId]);
 
+    const handleConfirmOrder = useCallback(async () => {
+        await mainService.confirmOrder(order.id);
+    }, [order.id]);
+
     useEffect(() => {
         if (!user) return;
 
@@ -147,12 +151,14 @@ const TeamCart = () => {
     }, []);
 
     useEffect(() => {
+        if (order.isConfirm) return () => {};
+
         const interval = setInterval(fetchOrderDetails, 10000);
 
         return () => {
             clearInterval(interval);
         };
-    }, [fetchOrderDetails]);
+    }, [fetchOrderDetails, order.isConfirm]);
 
     useEffect(() => {
         fetchShopDetails();
@@ -370,7 +376,7 @@ const TeamCart = () => {
                             </Typography>
                         </Box>
                         {isHost() && (
-                            <Button fullWidth variant="contained" color="info">
+                            <Button fullWidth variant="contained" color="info" onClick={handleConfirmOrder}>
                                 Chốt đơn
                             </Button>
                         )}
