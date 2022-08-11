@@ -23,6 +23,8 @@ import { useSelector } from 'react-redux';
 import * as mainService from 'services/main.service';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
 import foodPlaceholder from 'assets/images/food-placeholder.png';
+import { useSnackbar } from 'notistack';
+import { useConfirm } from 'material-ui-confirm';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -53,6 +55,8 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
 
 const OrderCart = () => {
     const { orderId } = useParams();
+    const { enqueueSnackbar } = useSnackbar();
+    const confirm = useConfirm();
     const navigate = useNavigate();
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
@@ -70,6 +74,8 @@ const OrderCart = () => {
         }
 
         setMySubOrder({ ...mySubOrder, using: true });
+
+        enqueueSnackbar(`+1 ${item.name}`, { variant: 'success' });
     };
 
     const subItem = (item) => {
@@ -82,6 +88,8 @@ const OrderCart = () => {
         }
 
         setMySubOrder({ ...mySubOrder, using: true });
+
+        enqueueSnackbar(`-1 ${item.name}`, { variant: 'info' });
     };
 
     const submitMySubOrder = useCallback(async () => {
@@ -106,14 +114,27 @@ const OrderCart = () => {
 
     const removeTeamSubOrder = useCallback(
         async (ownerId) => {
+            const subOrder = order.subOrders.find((x) => x.owner.id === ownerId);
+            if (!subOrder) return;
+
+            try {
+                await confirm({
+                    title: `Bạn muốn xóa đặt hàng của ${subOrder.owner.name}?`
+                });
+            } catch (error) {
+                return;
+            }
+
             await mainService.removeSubOrder(orderId, ownerId);
+
+            enqueueSnackbar(`Đã xóa đặt hàng của ${subOrder.owner.name}`, { variant: 'info' });
 
             setOrder({
                 ...order,
                 subOrders: order.subOrders.filter((x) => x.owner.id !== ownerId)
             });
         },
-        [order, orderId]
+        [order, orderId, enqueueSnackbar, confirm]
     );
 
     const fetchOrderDetails = useCallback(async () => {
@@ -121,13 +142,19 @@ const OrderCart = () => {
         setOrder(order);
 
         const myConfirmedSubOrder = order?.subOrders?.find((x) => x.owner?.id === user?.id);
+        if (!myConfirmedSubOrder && mySubOrder.confirmed) {
+            setMySubOrder({ owner: user, items: [], using: false, confirmed: false });
+            enqueueSnackbar(`Đặt hàng của bạn đã bị hủy`, { variant: 'warning', persist: true });
+            return;
+        }
+
         if (myConfirmedSubOrder && !mySubOrder.using) {
             setMySubOrder({
                 ...myConfirmedSubOrder,
                 confirmed: true
             });
         }
-    }, [mySubOrder.using, orderId, user?.id]);
+    }, [orderId, mySubOrder, user, enqueueSnackbar]);
 
     const fetchShopDetails = useCallback(async () => {
         if (!order.shopId) return;
@@ -139,9 +166,17 @@ const OrderCart = () => {
     const handleConfirmOrder = useCallback(async () => {
         if (order.subOrders.length === 0) return;
 
+        try {
+            await confirm({
+                title: `Chốt đơn hàng?`
+            });
+        } catch (error) {
+            return;
+        }
+
         await mainService.confirmOrder(order.id);
         await fetchOrderDetails();
-    }, [order, fetchOrderDetails]);
+    }, [order, fetchOrderDetails, confirm]);
 
     useEffect(() => {
         if (!user) return;
