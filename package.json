@@ -6,6 +6,7 @@
         "@emotion/cache": "^11.9.3",
         "@emotion/react": "^11.9.3",
         "@emotion/styled": "^11.9.3",
+        "@microsoft/signalr": "^6.0.8",
         "@mui/icons-material": "^5.8.4",
         "@mui/lab": "^5.0.0-alpha.70",
         "@mui/material": "^5.8.6",
@@ -16,6 +17,7 @@
         "apexcharts": "^3.35.3",
         "axios": "^0.27.2",
         "axios-retry": "^3.3.1",
+        "dotenv": "^16.0.1",
         "formik": "^2.2.9",
         "framer-motion": "^4.1.13",
         "material-ui-confirm": "^3.0.4",
@@ -37,7 +39,6 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "start:test": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"

@@ -20,7 +20,7 @@ const style = {
     p: 4
 };
 
-const AuthGuard = () => {
+const AuthProvider = () => {
     const dispatch = useDispatch();
     const user = useSelector((x) => x.auth?.user);
     const [name, setName] = React.useState('');
@@ -77,4 +77,4 @@ const AuthGuard = () => {
     );
 };
 
-export default AuthGuard;
+export default AuthProvider;

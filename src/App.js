@@ -12,7 +12,8 @@ import themes from 'themes';
 
 // project imports
 import NavigationScroll from 'layout/NavigationScroll';
-import AuthGuard from 'layout/AuthGuard';
+import AuthProvider from 'providers/AuthProvider';
+import HubProvider from 'providers/HubProvider';
 
 // ==============================|| APP ||============================== //
 
@@ -24,11 +25,13 @@ const App = () => {
             <ThemeProvider theme={themes(customization)}>
                 <SnackbarProvider maxSnack={3} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
                     <ConfirmProvider>
-                        <CssBaseline />
-                        <NavigationScroll>
-                            <Routes />
-                            <AuthGuard />
-                        </NavigationScroll>
+                        <HubProvider>
+                            <CssBaseline />
+                            <NavigationScroll>
+                                <Routes />
+                                <AuthProvider />
+                            </NavigationScroll>
+                        </HubProvider>
                     </ConfirmProvider>
                 </SnackbarProvider>
             </ThemeProvider>
