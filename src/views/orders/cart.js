@@ -61,7 +61,7 @@ const OrderCart = () => {
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
     const [shop, setShop] = useState({ sections: [] });
-    const [mySubOrder, setMySubOrder] = useState({ owner: null, items: [], using: false, confirmed: false });
+    const [mySubOrder, setMySubOrder] = useState({ owner: null, items: [], using: false, confirmed: false, note: '' });
 
     const isHost = () => user.id === order.host?.id;
 
@@ -103,14 +103,22 @@ const OrderCart = () => {
     }, [mySubOrder, order, orderId]);
 
     const removeMySubOrder = useCallback(async () => {
+        try {
+            await confirm({
+                title: `Bạn muốn đặt lại?`
+            });
+        } catch (error) {
+            return;
+        }
+
         await mainService.removeSubOrder(orderId, user.id);
 
-        setMySubOrder({ owner: user, items: [], using: false, confirmed: false });
+        setMySubOrder({ owner: user, items: [], using: false, confirmed: false, note: '' });
         setOrder({
             ...order,
             subOrders: order.subOrders.filter((x) => x.owner.id !== user.id)
         });
-    }, [order, orderId, user]);
+    }, [order, orderId, user, confirm]);
 
     const removeTeamSubOrder = useCallback(
         async (ownerId) => {
@@ -274,7 +282,7 @@ const OrderCart = () => {
                                                     disabled={mySubOrder.confirmed || !item.isAvailable}
                                                     onClick={() => addItem(item)}
                                                 >
-                                                    Thêm
+                                                    {`${item.isAvailable ? 'Thêm' : 'Hết hàng'}`}
                                                 </Button>
                                             </Grid>
                                         </Grid>
@@ -328,7 +336,7 @@ const OrderCart = () => {
                                 variant="filled"
                                 label="Note"
                                 disabled={mySubOrder.confirmed}
-                                value={mySubOrder?.note}
+                                value={mySubOrder.note || ''}
                                 onChange={(e) => {
                                     setMySubOrder({ ...mySubOrder, note: e.target.value });
                                 }}
