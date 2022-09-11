@@ -12,7 +12,7 @@ import themes from 'themes';
 
 // project imports
 import NavigationScroll from 'layout/NavigationScroll';
-import AuthProvider from 'providers/AuthProvider';
+import CustomAuth0Provider from 'providers/CustomAuth0Provider';
 import HubProvider from 'providers/HubProvider';
 
 // ==============================|| APP ||============================== //
@@ -28,8 +28,10 @@ const App = () => {
                         <HubProvider>
                             <CssBaseline />
                             <NavigationScroll>
-                                <Routes />
-                                <AuthProvider />
+                                <CustomAuth0Provider>
+                                    <Routes />
+                                </CustomAuth0Provider>
+                                {/* <AuthProvider /> */}
                             </NavigationScroll>
                         </HubProvider>
                     </ConfirmProvider>
