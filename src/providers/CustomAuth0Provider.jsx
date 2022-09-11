@@ -5,12 +5,12 @@ import { useEffect } from 'react';
 import { setUser } from 'store/auth/actions';
 import Loader from 'ui-component/Loader';
 import { v5 as uuidv5 } from 'uuid';
+import { getUserWithMetadata } from 'services/auth0.service';
 
 const config = {
     domain: 'tpick.us.auth0.com',
     clientId: 'Nl1KOiLDjUgsk8lVts7jRqb3CjisjWzV',
-    redirectUri: window.location.origin,
-    audience: 'https://tpick.tk'
+    redirectUri: window.location.origin
 };
 
 const Auth0Wrapper = ({ children }) => {
@@ -20,12 +20,15 @@ const Auth0Wrapper = ({ children }) => {
     useEffect(() => {
         if (!user) return;
 
-        const enhancedUser = {
-            ...user,
-            id: uuidv5(user.sub, '073552a3-ebe7-4e3a-ae42-b6608740774e')
-        };
+        getUserWithMetadata(user.sub, (userWithMetadata) => {
+            const enhancedUser = {
+                ...user,
+                name: userWithMetadata.user_metadata?.name || user.name,
+                id: uuidv5(user.sub, '073552a3-ebe7-4e3a-ae42-b6608740774e')
+            };
 
-        dispatch(setUser(enhancedUser));
+            dispatch(setUser(enhancedUser));
+        });
     }, [dispatch, user]);
 
     return <div>{children}</div>;
@@ -43,7 +46,7 @@ const CustomAuth0Provider = ({ children }) => {
     };
 
     return (
-        <Auth0Provider {...config} onRedirectCallback={onRedirectCallback}>
+        <Auth0Provider {...config} onRedirectCallback={onRedirectCallback} audi>
             <EnhancedAuth0Wrapper>{children}</EnhancedAuth0Wrapper>
         </Auth0Provider>
     );

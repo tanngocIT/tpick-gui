@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useAuth0 } from "@auth0/auth0-react";
+import { useDispatch, useSelector } from 'react-redux';
+import { useAuth0 } from '@auth0/auth0-react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -10,7 +9,6 @@ import {
     Box,
     Chip,
     ClickAwayListener,
-    Grid,
     List,
     ListItemButton,
     ListItemIcon,
@@ -29,18 +27,19 @@ import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 
 // assets
-import { IconLogout, IconSettings, IconUser } from '@tabler/icons';
+import { IconLogout, IconSettings } from '@tabler/icons';
+import { clearUser } from 'store/auth/actions';
+import { patchUserMetadata } from 'services/auth0.service';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
+    const dispatch = useDispatch();
     const theme = useTheme();
     const { logout } = useAuth0();
     const customization = useSelector((state) => state.customization);
-    const navigate = useNavigate();
     const user = useSelector((state) => state?.auth?.user);
 
-    const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
@@ -50,7 +49,18 @@ const ProfileSection = () => {
     const handleLogout = async () => {
         logout({
             returnTo: window.location.origin
-        })
+        });
+        dispatch(clearUser());
+    };
+
+    const handleChangeName = () => {
+        // eslint-disable-next-line no-alert
+        const name = prompt('Enter your name');
+        if (!name) return;
+
+        patchUserMetadata(user.sub, { name }, () => {
+            window.location.reload();
+        });
     };
 
     const handleClose = (event) => {
@@ -60,14 +70,6 @@ const ProfileSection = () => {
         setOpen(false);
     };
 
-    const handleListItemClick = (event, index, route = '') => {
-        setSelectedIndex(index);
-        handleClose(event);
-
-        if (route && route !== '') {
-            navigate(route);
-        }
-    };
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
     };
@@ -201,45 +203,15 @@ const ProfileSection = () => {
                                             >
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    selected={selectedIndex === 0}
-                                                    onClick={(event) => handleListItemClick(event, 0, '')}
+                                                    onClick={handleChangeName}
                                                 >
                                                     <ListItemIcon>
                                                         <IconSettings stroke={1.5} size="1.3rem" />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
+                                                    <ListItemText primary={<Typography variant="body2">Change name</Typography>} />
                                                 </ListItemButton>
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    selected={selectedIndex === 1}
-                                                    onClick={(event) => handleListItemClick(event, 1, '')}
-                                                >
-                                                    <ListItemIcon>
-                                                        <IconUser stroke={1.5} size="1.3rem" />
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                        primary={
-                                                            <Grid container spacing={1} justifyContent="space-between">
-                                                                <Grid item>
-                                                                    <Typography variant="body2">Social Profile</Typography>
-                                                                </Grid>
-                                                                <Grid item>
-                                                                    <Chip
-                                                                        label="02"
-                                                                        size="small"
-                                                                        sx={{
-                                                                            bgcolor: theme.palette.warning.dark,
-                                                                            color: theme.palette.background.default
-                                                                        }}
-                                                                    />
-                                                                </Grid>
-                                                            </Grid>
-                                                        }
-                                                    />
-                                                </ListItemButton>
-                                                <ListItemButton
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    selected={selectedIndex === 4}
                                                     onClick={handleLogout}
                                                 >
                                                     <ListItemIcon>
