@@ -25,15 +25,14 @@ const App = () => {
             <ThemeProvider theme={themes(customization)}>
                 <SnackbarProvider maxSnack={3} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
                     <ConfirmProvider>
-                        <HubProvider>
-                            <CssBaseline />
-                            <NavigationScroll>
-                                <CustomAuth0Provider>
+                        <CustomAuth0Provider>
+                            <HubProvider>
+                                <CssBaseline />
+                                <NavigationScroll>
                                     <Routes />
-                                </CustomAuth0Provider>
-                                {/* <AuthProvider /> */}
-                            </NavigationScroll>
-                        </HubProvider>
+                                </NavigationScroll>
+                            </HubProvider>
+                        </CustomAuth0Provider>
                     </ConfirmProvider>
                 </SnackbarProvider>
             </ThemeProvider>

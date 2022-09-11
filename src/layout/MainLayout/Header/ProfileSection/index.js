@@ -55,7 +55,7 @@ const ProfileSection = () => {
 
     const handleChangeName = () => {
         // eslint-disable-next-line no-alert
-        const name = prompt('Enter your name');
+        const name = prompt('Enter your name:');
         if (!name) return;
 
         patchUserMetadata(user.sub, { name }, () => {

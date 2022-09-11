@@ -4,13 +4,11 @@ const URL = process.env.REACT_APP_RHUB ?? 'http://localhost:5010/hub';
 
 let connection;
 // let dispatch;
-let accessToken;
 
-export const newConnection = async () => {
+export const newConnection = async (accessToken) => {
     if (connection) {
         await connection.stop();
     }
-    accessToken = localStorage.getItem('accessToken') || "meo_to_token_gi_ca";
     connection = new signalR.HubConnectionBuilder()
         .withUrl(URL, {
             skipNegotiation: true,

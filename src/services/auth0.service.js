@@ -3,16 +3,30 @@ import { Management, WebAuth } from 'auth0-js';
 const webAuth = new WebAuth({
     clientID: 'Nl1KOiLDjUgsk8lVts7jRqb3CjisjWzV',
     domain: 'tpick.us.auth0.com',
-    audience: `https://tpick.us.auth0.com/api/v2/`,
+    audience: 'https://tpick.us.auth0.com/api/v2/',
     scope: 'read:current_user update:current_user_metadata',
     responseType: 'token id_token',
-    redirectUri: window.location.origin
+    redirectUri: window.location.origin,
+    popupOrigin: window.location.origin
 });
 
-const triggerWithManagement = (onManagement) => {
+const triggerWithManagement = (onManagement = () => {}) => {
     webAuth.checkSession({}, (err, authResult) => {
         if (err) {
-            webAuth.authorize();
+            webAuth.popup.authorize(
+                {
+                    owp: true
+                },
+                (_, authResult) => {
+                    const management = new Management({
+                        domain: 'tpick.us.auth0.com',
+                        token: authResult.accessToken
+                    });
+
+                    onManagement(management);
+                    webAuth.popup.callback();
+                }
+            );
             return;
         }
         const management = new Management({
@@ -24,7 +38,7 @@ const triggerWithManagement = (onManagement) => {
     });
 };
 
-export const getUserWithMetadata = (userSub, onUserWithMetadata) => {
+export const getUserWithMetadata = (userSub, onUserWithMetadata = () => {}) => {
     triggerWithManagement((management) => {
         management.getUser(userSub, (err, userWithMetadata) => {
             if (err) return;

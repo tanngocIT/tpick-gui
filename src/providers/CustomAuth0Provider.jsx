@@ -10,6 +10,7 @@ import { getUserWithMetadata } from 'services/auth0.service';
 const config = {
     domain: 'tpick.us.auth0.com',
     clientId: 'Nl1KOiLDjUgsk8lVts7jRqb3CjisjWzV',
+    audience: 'https://tpick.tk',
     redirectUri: window.location.origin
 };
 
@@ -46,7 +47,7 @@ const CustomAuth0Provider = ({ children }) => {
     };
 
     return (
-        <Auth0Provider {...config} onRedirectCallback={onRedirectCallback} audi>
+        <Auth0Provider {...config} onRedirectCallback={onRedirectCallback}>
             <EnhancedAuth0Wrapper>{children}</EnhancedAuth0Wrapper>
         </Auth0Provider>
     );
