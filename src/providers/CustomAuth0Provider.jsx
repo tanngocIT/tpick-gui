@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { setUser } from 'store/auth/actions';
 import Loader from 'ui-component/Loader';
+import { v5 as uuidv5 } from 'uuid';
 
 const config = {
     domain: 'tpick.us.auth0.com',
@@ -17,16 +18,21 @@ const Auth0Wrapper = ({ children }) => {
     const { user } = useAuth0();
 
     useEffect(() => {
-        if (user) {
-            dispatch(setUser(user));
-        }
+        if (!user) return;
+
+        const enhancedUser = {
+            ...user,
+            id: uuidv5(user.sub, '073552a3-ebe7-4e3a-ae42-b6608740774e')
+        };
+
+        dispatch(setUser(enhancedUser));
     }, [dispatch, user]);
 
     return <div>{children}</div>;
 };
 
 const EnhancedAuth0Wrapper = withAuthenticationRequired(Auth0Wrapper, {
-    onRedirecting: () => <Loader/>
+    onRedirecting: () => <Loader />
 });
 
 const CustomAuth0Provider = ({ children }) => {

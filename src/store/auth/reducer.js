@@ -28,7 +28,8 @@ const authReducer = (state = getInitialState(), action) => {
             return state;
     }
 
-    localStorage.setItem('authState', JSON.stringify(state));
+    // Auth0 now so we don't need to save to local storage
+    // localStorage.setItem('authState', JSON.stringify(state));
 
     return state;
 };
