@@ -25,6 +25,7 @@ import { sum, toLocalePrice } from 'utils/pricing-tool';
 import foodPlaceholder from 'assets/images/food-placeholder.png';
 import { useSnackbar } from 'notistack';
 import { useConfirm } from 'material-ui-confirm';
+import { addToGroup } from 'services/hub.service';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -216,6 +217,13 @@ const OrderCart = () => {
     useEffect(() => {
         fetchShopDetails();
     }, [fetchShopDetails]);
+
+    useEffect(() => {
+        if (!order.id) return;
+
+        const groupName = `order-${order.id}`;
+        addToGroup(groupName, order.id);
+    }, [order.id]);
 
     if (!user) return null;
 
