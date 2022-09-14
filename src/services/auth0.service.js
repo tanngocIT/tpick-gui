@@ -6,27 +6,21 @@ const webAuth = new WebAuth({
     audience: 'https://tpick.us.auth0.com/api/v2/',
     scope: 'read:current_user update:current_user_metadata',
     responseType: 'token id_token',
-    redirectUri: window.location.origin,
-    popupOrigin: window.location.origin
+    redirectUri: window.location.origin
 });
 
 const triggerWithManagement = (onManagement = () => {}) => {
     webAuth.checkSession({}, (err, authResult) => {
         if (err) {
-            webAuth.popup.authorize(
-                {
-                    owp: true
-                },
-                (_, authResult) => {
-                    const management = new Management({
-                        domain: 'tpick.us.auth0.com',
-                        token: authResult.accessToken
-                    });
+            sessionStorage.setItem('auth0-js:redirect', window.location.hash);
+            webAuth.authorize({}, (_, authResult) => {
+                const management = new Management({
+                    domain: 'tpick.us.auth0.com',
+                    token: authResult.accessToken
+                });
 
-                    onManagement(management);
-                    webAuth.popup.callback();
-                }
-            );
+                onManagement(management);
+            });
             return;
         }
         const management = new Management({

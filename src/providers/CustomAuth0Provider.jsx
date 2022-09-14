@@ -36,15 +36,22 @@ const Auth0Wrapper = ({ children }) => {
 };
 
 const EnhancedAuth0Wrapper = withAuthenticationRequired(Auth0Wrapper, {
-    onRedirecting: () => <Loader />
+    onRedirecting: () => <Loader />,
+    returnTo: () => window.location.hash.substring(1)
 });
 
 const CustomAuth0Provider = ({ children }) => {
     const navigate = useNavigate();
 
     const onRedirectCallback = (appState) => {
-        navigate(appState && appState.returnTo ? appState.returnTo : window.location.pathname);
+        navigate(appState?.returnTo || window.location.pathname);
     };
+
+    useEffect(() => {
+        if (window.location.hash.startsWith('#access_token')) {
+            window.location.hash = sessionStorage.getItem('auth0-js:redirect') || '';
+        }
+    }, []);
 
     return (
         <Auth0Provider {...config} onRedirectCallback={onRedirectCallback}>
