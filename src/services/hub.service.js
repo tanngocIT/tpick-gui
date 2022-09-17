@@ -1,13 +1,14 @@
 import * as signalR from '@microsoft/signalr';
+import { noticeOrderRefreshed } from 'store/liveOrder/actions';
 
 const URL = process.env.REACT_APP_RHUB ?? 'http://localhost:5010/hub';
 
 let connection;
 let dispatch;
 
-const initHandlers = () => {
+const initHandlers = (connection) => {
     connection.on('OrderRefreshed', () => {
-        dispatch({ type: 'OrderRefreshed' });
+        dispatch(noticeOrderRefreshed());
     });
 };
 
@@ -24,11 +25,19 @@ export const newConnection = async (accessToken, initDispatch) => {
 
             accessTokenFactory: () => accessToken
         })
-        .withAutomaticReconnect([0, 5000, 10000, 20000, 60000, 300000])
+        .withAutomaticReconnect([500, 2000, 5000, 10000])
         .configureLogging(signalR.LogLevel.None)
         .build();
 
-    initHandlers();
+    connection.onreconnecting(() => {
+        console.log('SignalR reconnecting...');
+    });
+
+    connection.onreconnected(() => {
+        console.log('SignalR reconnected.');
+    });
+
+    initHandlers(connection);
 
     try {
         await connection.start();

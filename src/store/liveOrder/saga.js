@@ -14,7 +14,12 @@ function* getLiveShopHandler({ payload }) {
     yield put(actions.getLiveShopSuccess(shop));
 }
 
+function* noticeOrderRefreshedHandler() {
+    yield put(actions.noticeOrderRefreshedSuccess(new Date()));
+}
+
 export function* liveOrderSaga() {
     yield takeLatest(actions.getLiveOrder, getLiveOrderHandler);
     yield takeLatest(actions.getLiveShop, getLiveShopHandler);
+    yield takeLatest(actions.noticeOrderRefreshed, noticeOrderRefreshedHandler);
 }
