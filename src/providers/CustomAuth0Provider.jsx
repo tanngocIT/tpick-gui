@@ -49,7 +49,9 @@ const CustomAuth0Provider = ({ children }) => {
 
     useEffect(() => {
         if (window.location.hash.startsWith('#access_token')) {
-            window.location.hash = sessionStorage.getItem('auth0-js:redirect') || '';
+            setTimeout(() => {
+                window.location.hash = sessionStorage.getItem('auth0-js:redirect') || '';
+            }, 200);    
         }
     }, []);
 
