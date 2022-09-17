@@ -1,4 +1,5 @@
 import * as actionTypes from './actions';
+import { createReducer } from '@reduxjs/toolkit';
 
 const getInitialState = () => {
     try {
@@ -10,27 +11,15 @@ const getInitialState = () => {
     }
 };
 
-const authReducer = (state = getInitialState(), action) => {
-    switch (action.type) {
-        case actionTypes.SET_USER:
-            state = {
-                ...state,
-                user: action.user
-            };
-            break;
-        case actionTypes.CLEAR_USER:
-            state = {
-                ...state,
-                user: null
-            };
-            break;
-        default:
-            return state;
+const authReducer = createReducer(getInitialState(), {
+    [actionTypes.SET_USER]: (state, action) => {
+        state.user = action.payload;
+        localStorage.setItem('authState', JSON.stringify(state));
+    },
+    [actionTypes.CLEAR_USER]: (state) => {
+        state.user = null;
+        localStorage.setItem('authState', JSON.stringify(state));
     }
-
-    localStorage.setItem('authState', JSON.stringify(state));
-
-    return state;
-};
+});
 
 export default authReducer;

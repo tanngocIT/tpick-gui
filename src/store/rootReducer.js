@@ -1,9 +1,7 @@
-import { combineReducers } from 'redux';
-
 import customizationReducer from './customization/customizationReducer';
 import authReducer from './auth/reducer';
 
-const reducer = combineReducers({
+const reducer = ({
     auth: authReducer,
     customization: customizationReducer
 });
