@@ -19,13 +19,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as mainService from 'services/main.service';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
 import foodPlaceholder from 'assets/images/food-placeholder.png';
 import { useSnackbar } from 'notistack';
 import { useConfirm } from 'material-ui-confirm';
 import { addToGroup } from 'services/hub.service';
+import { getLiveShop } from 'store/liveOrder/actions';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -59,10 +60,12 @@ const OrderCart = () => {
     const { enqueueSnackbar } = useSnackbar();
     const confirm = useConfirm();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
-    const [shop, setShop] = useState({ sections: [] });
     const [mySubOrder, setMySubOrder] = useState({ owner: null, items: [], using: false, confirmed: false, note: '' });
+
+    const shop = useSelector((x) => x.liveOrder?.shop);
 
     const isHost = () => user.id === order.host?.id;
 
@@ -165,13 +168,6 @@ const OrderCart = () => {
         }
     }, [orderId, mySubOrder, user, enqueueSnackbar]);
 
-    const fetchShopDetails = useCallback(async () => {
-        if (!order.shopId) return;
-
-        const shop = await mainService.getShopDetails(order.shopId);
-        setShop(shop);
-    }, [order?.shopId]);
-
     const handleConfirmOrder = useCallback(async () => {
         if (order.subOrders.length === 0) return;
 
@@ -215,8 +211,10 @@ const OrderCart = () => {
     }, [navigate, order.id, order.isConfirm]);
 
     useEffect(() => {
-        fetchShopDetails();
-    }, [fetchShopDetails]);
+        if (!order.shopId) return;
+        
+        dispatch(getLiveShop(order.shopId));
+    }, [dispatch, order.shopId]);
 
     useEffect(() => {
         if (!order.id) return;
