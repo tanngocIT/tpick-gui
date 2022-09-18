@@ -47,7 +47,6 @@ const OrderDetails = () => {
     const { orderId } = useParams();
     const user = useSelector((x) => x.auth?.user);
     const [order, setOrder] = useState({ subOrders: [] });
-    const [mySubOrder, setMySubOrder] = useState({ owner: null, items: [], using: false, confirmed: false });
     const groupItemMap = order?.subOrders
         .map((subOrder) => subOrder.items.map((item) => ({ ...item, note: subOrder.note })))
         .flatMap((items) => items)
@@ -74,22 +73,7 @@ const OrderDetails = () => {
     const fetchOrderDetails = useCallback(async () => {
         const order = await mainService.getOrderDetails(orderId);
         setOrder(order);
-
-        const myConfirmedSubOrder = order?.subOrders?.find((x) => x.owner?.id === user?.id);
-        if (myConfirmedSubOrder && !mySubOrder.using) {
-            setMySubOrder({
-                ...myConfirmedSubOrder,
-                confirmed: true
-            });
-        }
-    }, [mySubOrder.using, orderId, user?.id]);
-
-    useEffect(() => {
-        if (!user) return;
-
-        setMySubOrder({ ...mySubOrder, owner: user });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [orderId]);
 
     useEffect(() => {
         fetchOrderDetails();

@@ -18,15 +18,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as mainService from 'services/main.service';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
 import foodPlaceholder from 'assets/images/food-placeholder.png';
 import { useSnackbar } from 'notistack';
 import { useConfirm } from 'material-ui-confirm';
 import { addToGroup } from 'services/hub.service';
-import { getLiveShop } from 'store/liveOrder/actions';
+import * as liveOrderActions from 'store/liveOrder/actions';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -62,49 +61,24 @@ const OrderCart = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = useSelector((x) => x.auth?.user);
-    const [order, setOrder] = useState({ subOrders: [] });
-    const [mySubOrder, setMySubOrder] = useState({ owner: null, items: [], using: false, confirmed: false, note: '' });
-
-    const shop = useSelector((x) => x.liveOrder?.shop);
+    const shop = useSelector((x) => x.liveOrder.shop);
+    const order = useSelector((x) => x.liveOrder.order);
+    const mySubOrder = useSelector((x) => x.liveOrder.mySubOrder);
+    const lastRefreshed = useSelector((x) => x.liveOrder.lastRefreshed);
 
     const isHost = () => user.id === order.host?.id;
 
     const addItem = (item) => {
-        const existingItem = mySubOrder.items.find((x) => x.name === item.name);
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            mySubOrder.items.push({ ...item, quantity: 1 });
-        }
-
-        setMySubOrder({ ...mySubOrder, using: true });
-
-        enqueueSnackbar(`+1 ${item.name}`, { variant: 'success' });
+        dispatch(liveOrderActions.addItemToSubOrder(item));
     };
 
     const minusItem = (item) => {
-        const existingItem = mySubOrder.items.find((x) => x.name === item.name);
-        if (!existingItem) return;
-
-        existingItem.quantity -= 1;
-        if (existingItem.quantity <= 0) {
-            mySubOrder.items = mySubOrder.items.filter((x) => x.name !== item.name);
-        }
-
-        setMySubOrder({ ...mySubOrder, using: true });
-
-        enqueueSnackbar(`-1 ${item.name}`, { variant: 'info' });
+        dispatch(liveOrderActions.minusItemFromSubOrder(item));
     };
 
     const submitMySubOrder = useCallback(async () => {
-        await mainService.submitSubOrder(orderId, mySubOrder);
-
-        setMySubOrder({ ...mySubOrder, using: false, confirmed: true });
-        setOrder({
-            ...order,
-            subOrders: [...order.subOrders, mySubOrder]
-        });
-    }, [mySubOrder, order, orderId]);
+        dispatch(liveOrderActions.submitSubOrder(mySubOrder));
+    }, [dispatch, mySubOrder]);
 
     const removeMySubOrder = useCallback(async () => {
         try {
@@ -115,14 +89,8 @@ const OrderCart = () => {
             return;
         }
 
-        await mainService.removeSubOrder(orderId, user.id);
-
-        setMySubOrder({ owner: user, items: [], using: false, confirmed: false, note: '' });
-        setOrder({
-            ...order,
-            subOrders: order.subOrders.filter((x) => x.owner.id !== user.id)
-        });
-    }, [order, orderId, user, confirm]);
+        dispatch(liveOrderActions.removeSubOrder(user.id));
+    }, [dispatch, user?.id, confirm]);
 
     const removeTeamSubOrder = useCallback(
         async (ownerId) => {
@@ -131,42 +99,17 @@ const OrderCart = () => {
 
             try {
                 await confirm({
-                    title: `Bạn muốn xóa đặt hàng của ${subOrder.owner.name}?`,
+                    title: `Bạn muốn xóa đặt hàng của ${subOrder.owner.name}?`
                 });
             } catch (error) {
                 return;
             }
 
-            await mainService.removeSubOrder(orderId, ownerId);
-
+            dispatch(liveOrderActions.removeSubOrder(subOrder.owner.id));
             enqueueSnackbar(`Đã xóa đặt hàng của ${subOrder.owner.name}`, { variant: 'info' });
-
-            setOrder({
-                ...order,
-                subOrders: order.subOrders.filter((x) => x.owner.id !== ownerId)
-            });
         },
-        [order, orderId, enqueueSnackbar, confirm]
+        [order, dispatch, enqueueSnackbar, confirm]
     );
-
-    const fetchOrderDetails = useCallback(async () => {
-        const order = await mainService.getOrderDetails(orderId);
-        setOrder(order);
-
-        const myConfirmedSubOrder = order?.subOrders?.find((x) => x.owner?.id === user?.id);
-        if (!myConfirmedSubOrder && mySubOrder.confirmed) {
-            setMySubOrder({ owner: user, items: [], using: false, confirmed: false });
-            enqueueSnackbar(`Đặt hàng của bạn đã bị hủy`, { variant: 'warning', persist: true });
-            return;
-        }
-
-        if (myConfirmedSubOrder && !mySubOrder.using) {
-            setMySubOrder({
-                ...myConfirmedSubOrder,
-                confirmed: true
-            });
-        }
-    }, [orderId, mySubOrder, user, enqueueSnackbar]);
 
     const handleConfirmOrder = useCallback(async () => {
         if (order.subOrders.length === 0) return;
@@ -179,49 +122,29 @@ const OrderCart = () => {
             return;
         }
 
-        await mainService.confirmOrder(order.id);
-        await fetchOrderDetails();
-    }, [order, fetchOrderDetails, confirm]);
+        dispatch(liveOrderActions.confirmLiveOrder());
+    }, [order, confirm, dispatch]);
 
     useEffect(() => {
-        if (!user) return;
-
-        setMySubOrder({ ...mySubOrder, owner: user });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
-
-    useEffect(() => {
-        fetchOrderDetails();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(fetchOrderDetails, 10000);
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [fetchOrderDetails]);
-
-    useEffect(() => {
-        if (!order.id) return;
+        if (!orderId) return;
         if (!order.isConfirm) return;
 
-        navigate(`/orders/${order.id}/details`);
-    }, [navigate, order.id, order.isConfirm]);
+        navigate(`/orders/${orderId}/details`);
+        dispatch(liveOrderActions.resetLiveOrderSuccess());
+    }, [navigate, dispatch, orderId, order?.isConfirm]);
 
     useEffect(() => {
-        if (!order.shopId) return;
-        
-        dispatch(getLiveShop(order.shopId));
-    }, [dispatch, order.shopId]);
+        if (!user.id && !orderId && !lastRefreshed) return;
+
+        dispatch(liveOrderActions.getLiveOrder(orderId));
+    }, [dispatch, user.id, orderId, lastRefreshed]);
 
     useEffect(() => {
-        if (!order.id) return;
+        if (!orderId) return;
 
-        const groupName = `order-${order.id}`;
-        addToGroup(groupName, order.id);
-    }, [order.id]);
+        const groupName = `order-${orderId}`;
+        addToGroup(groupName, orderId);
+    }, [orderId]);
 
     if (!user) return null;
 
@@ -344,7 +267,7 @@ const OrderCart = () => {
                                 disabled={mySubOrder.confirmed}
                                 value={mySubOrder.note || ''}
                                 onChange={(e) => {
-                                    setMySubOrder({ ...mySubOrder, note: e.target.value });
+                                    dispatch(liveOrderActions.setMySubOrderNote(e.target.value));
                                 }}
                             />
                             {mySubOrder.confirmed ? (
@@ -371,7 +294,7 @@ const OrderCart = () => {
                                 Chi tiết
                             </Typography>
                         </Box>
-                        {order.subOrders?.map((subOrder) => (
+                        {order?.subOrders?.map((subOrder) => (
                             <Accordion key={subOrder.owner.id}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                     <Box display="flex" alignItems="center">

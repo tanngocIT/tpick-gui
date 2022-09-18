@@ -32,6 +32,13 @@ const Auth0Wrapper = ({ children }) => {
         });
     }, [dispatch, user]);
 
+    useEffect(() => {
+        if (!user) return;
+        if (window.location.search.startsWith('?code=')) {
+            window.location.search = '';
+        }
+    }, [user]);
+
     return <div>{children}</div>;
 };
 
@@ -51,7 +58,7 @@ const CustomAuth0Provider = ({ children }) => {
         if (window.location.hash.startsWith('#access_token')) {
             setTimeout(() => {
                 window.location.hash = sessionStorage.getItem('auth0-js:redirect') || '';
-            }, 200);    
+            }, 200);
         }
     }, []);
 
