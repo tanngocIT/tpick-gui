@@ -82,7 +82,7 @@ const OrderCart = () => {
         enqueueSnackbar(`+1 ${item.name}`, { variant: 'success' });
     };
 
-    const subItem = (item) => {
+    const minusItem = (item) => {
         const existingItem = mySubOrder.items.find((x) => x.name === item.name);
         if (!existingItem) return;
 
@@ -131,7 +131,7 @@ const OrderCart = () => {
 
             try {
                 await confirm({
-                    title: `Bạn muốn xóa đặt hàng của ${subOrder.owner.name}?`
+                    title: `Bạn muốn xóa đặt hàng của ${subOrder.owner.name}?`,
                 });
             } catch (error) {
                 return;
@@ -320,7 +320,7 @@ const OrderCart = () => {
                                         <Typography variant="body1" fontSize={15} component="div">
                                             {item.quantity}
                                         </Typography>
-                                        <IconButton color="primary" onClick={() => subItem(item)} disabled={mySubOrder.confirmed}>
+                                        <IconButton color="primary" onClick={() => minusItem(item)} disabled={mySubOrder.confirmed}>
                                             <RemoveCircleIcon fontSize="small" />
                                         </IconButton>
                                     </Box>

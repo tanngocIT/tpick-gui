@@ -1,8 +1,6 @@
 import { useSelector } from 'react-redux';
-import { SnackbarProvider } from 'notistack';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
-import { ConfirmProvider } from 'material-ui-confirm';
 
 // routing
 import Routes from 'routes';
@@ -14,6 +12,7 @@ import themes from 'themes';
 import NavigationScroll from 'layout/NavigationScroll';
 import CustomAuth0Provider from 'providers/CustomAuth0Provider';
 import HubProvider from 'providers/HubProvider';
+import HelperProvider from 'providers/HelperProvider';
 
 // ==============================|| APP ||============================== //
 
@@ -23,18 +22,16 @@ const App = () => {
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={themes(customization)}>
-                <SnackbarProvider maxSnack={3} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
-                    <ConfirmProvider>
-                        <CustomAuth0Provider>
-                            <HubProvider>
-                                <CssBaseline />
-                                <NavigationScroll>
-                                    <Routes />
-                                </NavigationScroll>
-                            </HubProvider>
-                        </CustomAuth0Provider>
-                    </ConfirmProvider>
-                </SnackbarProvider>
+                <HelperProvider>
+                    <CustomAuth0Provider>
+                        <HubProvider>
+                            <CssBaseline />
+                            <NavigationScroll>
+                                <Routes />
+                            </NavigationScroll>
+                        </HubProvider>
+                    </CustomAuth0Provider>
+                </HelperProvider>
             </ThemeProvider>
         </StyledEngineProvider>
     );

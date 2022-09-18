@@ -2,9 +2,10 @@ import * as actionTypes from './actions';
 import { createReducer } from '@reduxjs/toolkit';
 
 const initState = {
-    order: {},
     shop: {},
-    lastRefreshed: null,
+    order: { subOrders: [] },
+    mySubOrder: { owner: null, items: [], using: false, confirmed: false, note: '' },
+    lastRefreshed: null
 };
 const liveOrderReducer = createReducer(initState, {
     [actionTypes.GET_LIVE_ORDER_SUCCESS]: (state, action) => {

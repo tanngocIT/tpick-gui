@@ -1,4 +1,4 @@
-import customizationReducer from './customization/customizationReducer';
+import customizationReducer from './customization/reducer';
 import authReducer from './auth/reducer';
 import liveOrderReducer from './liveOrder/reducer';
 

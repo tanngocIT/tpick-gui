@@ -30,11 +30,11 @@ export const newConnection = async (accessToken, initDispatch) => {
         .build();
 
     connection.onreconnecting(() => {
-        console.log('SignalR reconnecting...');
+        console.debug('SignalR reconnecting...');
     });
 
     connection.onreconnected(() => {
-        console.log('SignalR reconnected.');
+        console.debug('SignalR reconnected.');
     });
 
     initHandlers(connection);
