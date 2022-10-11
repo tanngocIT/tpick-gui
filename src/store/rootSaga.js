@@ -1,7 +1,7 @@
 import { all } from 'redux-saga/effects';
-import { liveOrderSaga } from './liveOrder/saga';
-
+import { sagas as liveOrderSagas } from './liveOrder/sagas';
+import { sagas as hubSagas } from './hub/sagas';
 
 export default function* rootSaga() {
-  yield all([liveOrderSaga()]);
+    yield all([liveOrderSagas(), hubSagas()]);
 }

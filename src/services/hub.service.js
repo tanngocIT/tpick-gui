@@ -1,5 +1,6 @@
 import * as signalR from '@microsoft/signalr';
 import { noticeOrderRefreshed } from 'store/liveOrder/actions';
+import {setHubState} from 'store/hub/actions';
 
 const URL = process.env.REACT_APP_RHUB ?? 'http://localhost:5010/hub';
 
@@ -30,20 +31,25 @@ export const newConnection = async (accessToken, initDispatch) => {
         .build();
 
     connection.onreconnecting(() => {
-        console.debug('SignalR reconnecting...');
+        dispatch(setHubState('reconnecting'));
+        console.log('SignalR reconnecting...');
     });
 
     connection.onreconnected(() => {
-        console.debug('SignalR reconnected.');
+        dispatch(setHubState('reconnected'));
+        console.log('SignalR reconnected.');
     });
 
     initHandlers(connection);
 
     try {
+        dispatch(setHubState('connecting'));
         await connection.start();
-        console.debug('SignalR Connected.');
+        dispatch(setHubState('connected'));
+        console.log('SignalR Connected.');
     } catch (e) {
-        console.debug('SignalR Error', e);
+        dispatch(setHubState('error'));
+        console.log('SignalR Error', e);
         await new Promise((resolve) => setTimeout(resolve, 10000));
     }
 };

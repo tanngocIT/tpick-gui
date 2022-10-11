@@ -98,7 +98,7 @@ function* confirmLiveOrderHandler() {
     yield call(mainService.confirmOrder, order.id);
 }
 
-export function* liveOrderSaga() {
+export function* sagas() {
     yield takeLatest(actions.getLiveOrder, getLiveOrderHandler);
     yield takeLatest(actions.getLiveShop, getLiveShopHandler);
     yield takeLatest(actions.noticeOrderRefreshed, noticeOrderRefreshedHandler);

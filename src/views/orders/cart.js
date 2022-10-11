@@ -24,8 +24,8 @@ import { sum, toLocalePrice } from 'utils/pricing-tool';
 import foodPlaceholder from 'assets/images/food-placeholder.png';
 import { useSnackbar } from 'notistack';
 import { useConfirm } from 'material-ui-confirm';
-import { addToGroup } from 'services/hub.service';
 import * as liveOrderActions from 'store/liveOrder/actions';
+import * as hubActions from 'store/hub/actions';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -140,11 +140,15 @@ const OrderCart = () => {
     }, [dispatch, user.id, orderId, lastRefreshed]);
 
     useEffect(() => {
-        if (!orderId) return;
+        if (!orderId) return () => {};
 
         const groupName = `order-${orderId}`;
-        addToGroup(groupName, orderId);
-    }, [orderId]);
+        dispatch(hubActions.addToGroup(groupName));
+
+        return () => {
+            dispatch(hubActions.removeFromGroup(groupName));
+        };
+    }, [orderId, dispatch]);
 
     if (!user) return null;
 
