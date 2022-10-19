@@ -18,9 +18,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
+import { toSlug } from 'utils/commom';
 import foodPlaceholder from 'assets/images/food-placeholder.png';
 import { useSnackbar } from 'notistack';
 import { useConfirm } from 'material-ui-confirm';
@@ -65,6 +66,7 @@ const OrderCart = () => {
     const order = useSelector((x) => x.liveOrder.order);
     const mySubOrder = useSelector((x) => x.liveOrder.mySubOrder);
     const lastRefreshed = useSelector((x) => x.liveOrder.lastRefreshed);
+    const [filteredShopSections, setFilteredShopSections] = useState([]);
 
     const isHost = () => user.id === order.host?.id;
 
@@ -125,6 +127,32 @@ const OrderCart = () => {
         dispatch(liveOrderActions.confirmLiveOrder());
     }, [order, confirm, dispatch]);
 
+    const handleSearchItems = (e) => {
+        const keyword = toSlug(e.target.value?.trim()) || '';
+        if (!keyword) {
+            setFilteredShopSections(shop.sections);
+            return;
+        }
+
+        const filteredSections = shop.sections
+            .map((section) => {
+                const filteredItems = section.items.filter((item) => toSlug(item.name).includes(keyword));
+                return {
+                    ...section,
+                    items: filteredItems
+                };
+            })
+            .filter((section) => section.items.length > 0);
+
+        setFilteredShopSections(filteredSections);
+    };
+
+    useEffect(() => {
+        if (!shop?.sections) return;
+
+        setFilteredShopSections(shop.sections);
+    }, [shop?.sections]);
+
     useEffect(() => {
         if (!orderId) return;
         if (!order.isConfirm) return;
@@ -167,15 +195,18 @@ const OrderCart = () => {
                 </Box>
             </Wrapper>
             <Grid item xs={12} lg={9} container spacing={1}>
-                {shop.sections?.map((section) => (
-                    <Grid key={section.name} item container spacing={1} mb={2}>
+                <Wrapper item xs={12}>
+                    <TextField id="search-box" label="Tìm kiếm..." variant="outlined" fullWidth onChange={handleSearchItems} />
+                </Wrapper>
+                {filteredShopSections?.map((section) => (
+                    <Grid key={Math.random()} item container spacing={1} mb={2}>
                         <Wrapper item xs={12}>
                             <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
                                 {section.name}
                             </Typography>
                         </Wrapper>
                         {section.items?.map((item) => (
-                            <Wrapper key={item.name} item xs={12} xl={6}>
+                            <Wrapper key={Math.random()} item xs={12} xl={6}>
                                 <Grid container>
                                     <Grid item xs={12} sm={3} md={2} xl={3} display="flex" alignItems="center" justifyContent="center">
                                         <img
@@ -351,18 +382,10 @@ const OrderCart = () => {
                         </Box>
                         <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                             <Typography variant="body1" fontSize={15} component="div">
-                                Giảm giá
+                                Host
                             </Typography>
                             <Typography variant="body1" fontSize={15} component="div">
-                                0
-                            </Typography>
-                        </Box>
-                        <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                            <Typography variant="body1" fontSize={15} component="div">
-                                Ship
-                            </Typography>
-                            <Typography variant="body1" fontSize={15} component="div">
-                                0
+                                {order?.host?.name}
                             </Typography>
                         </Box>
                         <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
