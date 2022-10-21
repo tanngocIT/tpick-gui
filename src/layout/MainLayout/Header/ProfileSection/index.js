@@ -29,12 +29,13 @@ import Transitions from 'ui-component/extended/Transitions';
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';
 import { clearUser } from 'store/auth/actions';
-import { patchUserMetadata } from 'services/auth0.service';
+import { useNavigate } from 'react-router';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const theme = useTheme();
     const { logout } = useAuth0();
     const customization = useSelector((state) => state.customization);
@@ -53,14 +54,8 @@ const ProfileSection = () => {
         dispatch(clearUser());
     };
 
-    const handleChangeName = () => {
-        // eslint-disable-next-line no-alert
-        const name = prompt('Enter your name:');
-        if (!name) return;
-
-        patchUserMetadata(user.sub, { name }, () => {
-            window.location.reload();
-        });
+    const handleUserInfo = () => {
+        navigate('/profile');
     };
 
     const handleClose = (event) => {
@@ -203,12 +198,12 @@ const ProfileSection = () => {
                                             >
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    onClick={handleChangeName}
+                                                    onClick={handleUserInfo}
                                                 >
                                                     <ListItemIcon>
                                                         <IconSettings stroke={1.5} size="1.3rem" />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Change name</Typography>} />
+                                                    <ListItemText primary={<Typography variant="body2">User profile</Typography>} />
                                                 </ListItemButton>
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}

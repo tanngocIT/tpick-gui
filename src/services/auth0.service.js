@@ -43,10 +43,9 @@ export const getUserWithMetadata = (userSub, onUserWithMetadata = () => {}) => {
 };
 
 export const patchUserMetadata = (userSub, metadata, cb = () => {}) => {
-    getUserWithMetadata(userSub, (userWithMetadata) => {
+    // getUserWithMetadata(userSub, (userWithMetadata) => {
         triggerWithManagement((management) => {
-            management.patchUserMetadata(userSub, { ...userWithMetadata.user_metadata, ...metadata }, () => {});
-            cb();
+            management.patchUserMetadata(userSub, metadata, cb);
         });
-    });
+    // });
 };

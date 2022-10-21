@@ -25,6 +25,7 @@ const Auth0Wrapper = ({ children }) => {
             const enhancedUser = {
                 ...user,
                 name: userWithMetadata.user_metadata?.name || user.name,
+                momo: userWithMetadata.user_metadata?.momo,
                 id: uuidv5(user.sub, '073552a3-ebe7-4e3a-ae42-b6608740774e')
             };
 
