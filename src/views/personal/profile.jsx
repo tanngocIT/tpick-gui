@@ -64,7 +64,6 @@ const Profile = () => {
                                         autoComplete="off"
                                         onChange={onChange}
                                         value={value}
-                                        type="number"
                                         label="Your MoMo phone"
                                         defaultValue={user?.momo}
                                     />

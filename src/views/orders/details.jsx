@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
 import * as liveOrderActions from 'store/liveOrder/actions';
+import QRCode from 'qrcode';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -50,6 +51,7 @@ const OrderDetails = () => {
     const user = useSelector((x) => x.auth?.user);
     const shop = useSelector((x) => x.liveOrder.shop);
     const order = useSelector((x) => x.liveOrder.order);
+    const momo = order?.host?.momo;
     const groupItemMap = order?.subOrders
         .map((subOrder) => subOrder.items.map((item) => ({ ...item, note: subOrder.note })))
         .flatMap((items) => items)
@@ -87,12 +89,20 @@ const OrderDetails = () => {
         }
     }, [navigate, dispatch, orderId, order?.isConfirm]);
 
+    useEffect(() => {
+        if (!momo) return;
+
+        const momoQrConfig = `2|99|${momo}|NAME|MAIL|0|0|0||transfer_myqr`;
+
+        QRCode.toCanvas(document.getElementById('momo'), momoQrConfig, { width: 205, margin: 1 });
+    }, [momo]);
+
     if (!user) return null;
 
     return (
         order && (
             <Grid container spacing={1}>
-                <Wrapper item xs={12}>
+                <Wrapper item xs={12} lg={momo ? 9 : 12} xl={momo ? 10 : 12}>
                     <Stack fontSize={15}>
                         <Box item lg={6} bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
                             <Box bgcolor="gainsboro" py={1.5}>
@@ -145,6 +155,16 @@ const OrderDetails = () => {
                         </Box>
                     </Stack>
                 </Wrapper>
+                {momo && (
+                    <Wrapper item xs={12} lg={3} xl={2}>
+                        <Box textAlign="center">
+                            <Typography variant="h5" textAlign="center">
+                                {order?.host?.name} MoMo
+                            </Typography>
+                            <canvas id="momo" />
+                        </Box>
+                    </Wrapper>
+                )}
                 <Wrapper item xs={12} lg={6}>
                     <Stack fontSize={15}>
                         <Box my={0.5}>
@@ -172,7 +192,6 @@ const OrderDetails = () => {
                                             </Typography>
                                         )}
                                     </Stack>
-
                                     <Typography variant="body" ml={0.5} color="primary">
                                         {`${toLocalePrice(groupItem.price * groupItem.quantity)}`}
                                     </Typography>
