@@ -125,6 +125,14 @@ const OrderDetails = () => {
                                 </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                <Typography variant="body1" component="div">
+                                    Số phần
+                                </Typography>
+                                <Typography variant="body1" component="div">
+                                    {sum(groupItems, (x) => x.quantity)}
+                                </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                                 <Typography variant="body1" component="div" color="primary" fontWeight="bold">
                                     Tổng
                                 </Typography>
