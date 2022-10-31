@@ -1,5 +1,6 @@
-import { Grid, Link } from '@mui/material';
+import { Grid } from '@mui/material';
 import MuiTypography from '@mui/material/Typography';
+import Link from 'next/link'
 
 // project imports
 import SubCard from 'ui-component/cards/SubCard';
@@ -106,7 +107,6 @@ const Typography = () => (
                             <MuiTypography
                                 variant="body2"
                                 color="primary"
-                                component={Link}
                                 href="https://berrydashboard.io"
                                 target="_blank"
                                 display="block"

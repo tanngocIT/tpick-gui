@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
@@ -28,13 +28,14 @@ import Transitions from 'ui-component/extended/Transitions';
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';
 import { clearUser } from 'store/auth/actions';
-import { useNavigate } from 'react-router';
+import { useRouter } from 'next/router';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const router = useRouter();
+
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const user = useSelector((state) => state?.auth?.user);
@@ -43,7 +44,7 @@ const ProfileSection = () => {
     /**
      * anchorRef is used on different components and specifying one type leads to other components throwing an error
      * */
-    const anchorRef = useRef(null);
+    const anchorRef = React.createRef(null);
 
     const handleLogout = async () => {
 
@@ -51,7 +52,7 @@ const ProfileSection = () => {
     };
 
     const handleUserInfo = () => {
-        navigate('/profile');
+        router.push('/profile');
     };
 
     const handleClose = (event) => {
@@ -65,7 +66,7 @@ const ProfileSection = () => {
         setOpen((prevOpen) => !prevOpen);
     };
 
-    const prevOpen = useRef(open);
+    const prevOpen = React.createRef(open);
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
             anchorRef.current.focus();

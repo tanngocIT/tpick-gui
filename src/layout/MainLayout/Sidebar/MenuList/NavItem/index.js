@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { forwardRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { forwardRef, useEffect } from 'react';
+// import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
@@ -40,7 +41,7 @@ const NavItem = ({ item, level }) => {
     }
 
     let listItemProps = {
-        component: forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url} target={itemTarget} />)
+        component: React.forwardRef((props, ref) => <Link ref={ref} href={item.url} target={itemTarget} ><a>{props.children}</a></Link>)
     };
     if (item?.external) {
         listItemProps = { component: 'a', href: item.url, target: itemTarget };

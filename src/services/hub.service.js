@@ -2,7 +2,7 @@ import * as signalR from '@microsoft/signalr';
 import { noticeOrderRefreshed } from 'store/liveOrder/actions';
 import {setHubState} from 'store/hub/actions';
 
-const URL = process.env.REACT_APP_RHUB ?? 'http://localhost:5010/hub';
+const URL = process.env.NEXT_PUBLIC_RHUB ?? 'http://localhost:5010/hub';
 
 let connection;
 let dispatch;

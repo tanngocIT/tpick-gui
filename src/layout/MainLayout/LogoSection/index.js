@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 // material-ui
 import { ButtonBase } from '@mui/material';
@@ -10,8 +10,12 @@ import Logo from 'ui-component/Logo';
 // ==============================|| MAIN LOGO ||============================== //
 
 const LogoSection = () => (
-    <ButtonBase disableRipple component={Link} to={config.defaultPath}>
-        <Logo />
+    <ButtonBase disableRipple>
+        <Link href={config.defaultPath}>
+            <a>
+                <Logo />
+            </a>
+        </Link>
     </ButtonBase>
 );
 

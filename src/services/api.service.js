@@ -1,7 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-axios.defaults.baseURL = process.env.REACT_APP_BASE_API;
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_BASE_API;
 const axiosOnce = axios.create();
 
 axiosRetry(axios, {
