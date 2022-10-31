@@ -76,10 +76,10 @@ const OrderDetails = () => {
     const groupItems = Object.values(groupItemMap)?.sort((a, b) => a.name.localeCompare(b.name));
 
     useEffect(() => {
-        if (!user.id && !orderId) return;
+        if (!user?.id) return;
 
         dispatch(liveOrderActions.getLiveOrder(orderId));
-    }, [dispatch, user.id, orderId]);
+    }, [dispatch, user?.id, orderId]);
 
     useEffect(() => {
         if (!orderId) return;

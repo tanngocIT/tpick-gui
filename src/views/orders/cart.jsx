@@ -162,10 +162,16 @@ const OrderCart = () => {
     }, [navigate, dispatch, orderId, order?.isConfirm]);
 
     useEffect(() => {
-        if (!user.id && !orderId && !lastRefreshed) return;
+        if (!lastRefreshed) return;
 
         dispatch(liveOrderActions.getLiveOrder(orderId));
-    }, [dispatch, user.id, orderId, lastRefreshed]);
+    }, [dispatch, orderId, lastRefreshed]);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        
+        dispatch(liveOrderActions.getLiveOrder(orderId));
+    }, [dispatch, orderId, user?.id]);
 
     useEffect(() => {
         if (!orderId) return () => {};
