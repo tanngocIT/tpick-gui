@@ -46,7 +46,7 @@ const SimpleAuthProvider = () => {
 
         const user = {
             id: uuid(),
-            name
+            name: name.trim()
         };
         dispatch(setUser(user));
     };

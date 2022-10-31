@@ -27,6 +27,34 @@ import { useConfirm } from 'material-ui-confirm';
 import * as liveOrderActions from 'store/liveOrder/actions';
 import * as hubActions from 'store/hub/actions';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
+import * as mainService from 'services/main.service';
+
+export async function getServerSideProps(context) {
+    const { orderId } = context.query;
+    if (!orderId) {
+        return {
+            props: {}
+        };
+    }
+
+    const order = await mainService.getOrderDetails(orderId);
+    const shop = await mainService.getShopDetails(order.shopId);
+
+    const title = `${shop.name} | TPick | ${order?.host?.name}`;
+    const description = `Cùng đặt nhóm thông qua TPick nào!`;
+    const image = shop.imageUrl || "https://tpick.netlify.app/og.jpg";
+
+    return {
+        props: {
+            seo: {
+                title,
+                description,
+                image
+            }
+        }
+    };
+}
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -55,7 +83,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
     borderRadius: 0
 }));
 
-const OrderCart = () => {
+const OrderCart = ({seo}) => {
     const router = useRouter();
     const { orderId } = router.query;
     const { enqueueSnackbar } = useSnackbar();
@@ -169,7 +197,7 @@ const OrderCart = () => {
 
     useEffect(() => {
         if (!user?.id) return;
-        
+
         dispatch(liveOrderActions.getLiveOrder(orderId));
     }, [dispatch, orderId, user?.id]);
 
@@ -184,243 +212,282 @@ const OrderCart = () => {
         };
     }, [orderId, dispatch]);
 
-    if (!user) return null;
-
     return (
-        order && (
-            <Grid container spacing={2}>
-                <Wrapper item xs={12}>
-                    <Box display="flex" p={1}>
-                        <Stack p={1} spacing={1}>
-                            <Typography variant="h2" fontSize={20} component="div">
-                                {shop.name}
-                            </Typography>
-                            <Typography variant="body1" fontSize={18} component="div">
-                                {shop.address}
-                            </Typography>
-                        </Stack>
-                    </Box>
-                </Wrapper>
-                <Grid item xs={12} lg={9} container spacing={1}>
+        <div>
+            {seo && (
+                <Head>
+                    <title>{seo.title}</title>
+                    <meta property="title" content={seo.title} />
+                    <meta property="description" content={seo.description} />
+                    <meta property="og:title" content={seo.title} />
+                    <meta property="og:description" content={seo.description} />
+                    <meta property="og:image" content={seo.image} />
+                    <meta property="og:type" content="website" />
+                </Head>
+            )}
+            {user && order && (
+                <Grid container spacing={2}>
                     <Wrapper item xs={12}>
-                        <TextField id="search-box" label="Tìm kiếm..." variant="outlined" fullWidth onChange={handleSearchItems} />
-                    </Wrapper>
-                    {filteredShopSections?.map((section) => (
-                        <Grid key={Math.random()} item container spacing={1} mb={2}>
-                            <Wrapper item xs={12}>
-                                <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
-                                    {section.name}
+                        <Box display="flex" p={1}>
+                            <Stack p={1} spacing={1}>
+                                <Typography variant="h2" fontSize={20} component="div">
+                                    {shop.name}
                                 </Typography>
-                            </Wrapper>
-                            {section.items?.map((item) => (
-                                <Wrapper key={Math.random()} item xs={12} xl={6}>
-                                    <Grid container>
-                                        <Grid item xs={12} sm={3} md={2} xl={3} display="flex" alignItems="center" justifyContent="center">
-                                            <img
-                                                style={{ width: '100%', maxWidth: '512px' }}
-                                                src={item.imageUrl || foodPlaceholder}
-                                                alt={item.name}
-                                            />
-                                        </Grid>
-                                        <Grid
-                                            item
-                                            xs={12}
-                                            sm={9}
-                                            md={10}
-                                            xl={9}
-                                            display="flex"
-                                            flexDirection="column"
-                                            justifyContent="space-between"
-                                            p={1}
-                                        >
-                                            <Typography variant="subtitle1" fontSize={16} component="div">
-                                                {item.name}
-                                            </Typography>
-                                            <Typography variant="caption" fontSize={15} component="div">
-                                                {item.description}
-                                            </Typography>
-                                            <Grid container display="flex" alignItems="center" justifyContent="space-between" spacing={1}>
-                                                <Grid item>
-                                                    <Typography variant="overline" fontSize={15} component="div">
-                                                        {toLocalePrice(item.price)}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
-                                                        startIcon={<AddIcon />}
-                                                        disabled={mySubOrder.confirmed || !item.isAvailable}
-                                                        onClick={() => addItem(item)}
-                                                    >
-                                                        {`${item.isAvailable ? 'Thêm' : 'Hết hàng'}`}
-                                                    </Button>
+                                <Typography variant="body1" fontSize={18} component="div">
+                                    {shop.address}
+                                </Typography>
+                            </Stack>
+                        </Box>
+                    </Wrapper>
+                    <Grid item xs={12} lg={9} container spacing={1}>
+                        <Wrapper item xs={12}>
+                            <TextField id="search-box" label="Tìm kiếm..." variant="outlined" fullWidth onChange={handleSearchItems} />
+                        </Wrapper>
+                        {filteredShopSections?.map((section) => (
+                            <Grid key={Math.random()} item container spacing={1} mb={2}>
+                                <Wrapper item xs={12}>
+                                    <Typography textAlign="center" variant="subtitle1" fontSize={18} component="div">
+                                        {section.name}
+                                    </Typography>
+                                </Wrapper>
+                                {section.items?.map((item) => (
+                                    <Wrapper key={Math.random()} item xs={12} xl={6}>
+                                        <Grid container>
+                                            <Grid
+                                                item
+                                                xs={12}
+                                                sm={3}
+                                                md={2}
+                                                xl={3}
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                            >
+                                                <img
+                                                    style={{ width: '100%', maxWidth: '512px' }}
+                                                    src={item.imageUrl || foodPlaceholder}
+                                                    alt={item.name}
+                                                />
+                                            </Grid>
+                                            <Grid
+                                                item
+                                                xs={12}
+                                                sm={9}
+                                                md={10}
+                                                xl={9}
+                                                display="flex"
+                                                flexDirection="column"
+                                                justifyContent="space-between"
+                                                p={1}
+                                            >
+                                                <Typography variant="subtitle1" fontSize={16} component="div">
+                                                    {item.name}
+                                                </Typography>
+                                                <Typography variant="caption" fontSize={15} component="div">
+                                                    {item.description}
+                                                </Typography>
+                                                <Grid
+                                                    container
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    justifyContent="space-between"
+                                                    spacing={1}
+                                                >
+                                                    <Grid item>
+                                                        <Typography variant="overline" fontSize={15} component="div">
+                                                            {toLocalePrice(item.price)}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            startIcon={<AddIcon />}
+                                                            disabled={mySubOrder.confirmed || !item.isAvailable}
+                                                            onClick={() => addItem(item)}
+                                                        >
+                                                            {`${item.isAvailable ? 'Thêm' : 'Hết hàng'}`}
+                                                        </Button>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
-                                    </Grid>
-                                </Wrapper>
-                            ))}
-                        </Grid>
-                    ))}
-                </Grid>
-                <Wrapper item xs={12} lg={3}>
-                    <Stack>
-                        {mySubOrder.items.length > 0 && (
-                            <Box border="0px solid gainsboro" bgcolor="#f7f7f7" my={0.5}>
+                                    </Wrapper>
+                                ))}
+                            </Grid>
+                        ))}
+                    </Grid>
+                    <Wrapper item xs={12} lg={3}>
+                        <Stack>
+                            {mySubOrder.items.length > 0 && (
+                                <Box border="0px solid gainsboro" bgcolor="#f7f7f7" my={0.5}>
+                                    <Box bgcolor="gainsboro" py={1.5}>
+                                        <Typography variant="h5" textAlign="center">
+                                            {`Đặt hàng của ${user.name}`}
+                                        </Typography>
+                                    </Box>
+                                    {mySubOrder.items.map((item) => (
+                                        <Box
+                                            key={item.name}
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                            px={1}
+                                            pr={0}
+                                        >
+                                            <Typography variant="body1" fontSize={15} component="div">
+                                                {item.name}
+                                            </Typography>
+                                            <Box display="flex" alignItems="center">
+                                                <IconButton color="primary" onClick={() => addItem(item)} disabled={mySubOrder.confirmed}>
+                                                    <AddCircleIcon fontSize="small" />
+                                                </IconButton>
+                                                <Typography variant="body1" fontSize={15} component="div">
+                                                    {item.quantity}
+                                                </Typography>
+                                                <IconButton color="primary" onClick={() => minusItem(item)} disabled={mySubOrder.confirmed}>
+                                                    <RemoveCircleIcon fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                        </Box>
+                                    ))}
+                                    <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                        <Typography variant="h6" fontSize={15} component="div">
+                                            Tổng
+                                        </Typography>
+                                        <Typography variant="h6" fontSize={15} component="div">
+                                            {toLocalePrice(
+                                                sum(mySubOrder.items, (x) => x.quantity * x.price),
+                                                false
+                                            )}
+                                        </Typography>
+                                    </Box>
+                                    <TextField
+                                        fullWidth
+                                        variant="filled"
+                                        label="Note"
+                                        disabled={mySubOrder.confirmed}
+                                        value={mySubOrder.note || ''}
+                                        onChange={(e) => {
+                                            dispatch(liveOrderActions.setMySubOrderNote(e.target.value));
+                                        }}
+                                    />
+                                    {mySubOrder.confirmed ? (
+                                        <Button fullWidth variant="contained" color="error" onClick={removeMySubOrder}>
+                                            Đặt lại
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            color="info"
+                                            onClick={submitMySubOrder}
+                                            disabled={!mySubOrder.items.length}
+                                        >
+                                            Xác nhận
+                                        </Button>
+                                    )}
+                                </Box>
+                            )}
+
+                            <Box bgcolor="#f7f7f7" my={0.5}>
                                 <Box bgcolor="gainsboro" py={1.5}>
                                     <Typography variant="h5" textAlign="center">
-                                        {`Đặt hàng của ${user.name}`}
+                                        Chi tiết
                                     </Typography>
                                 </Box>
-                                {mySubOrder.items.map((item) => (
-                                    <Box key={item.name} display="flex" alignItems="center" justifyContent="space-between" px={1} pr={0}>
-                                        <Typography variant="body1" fontSize={15} component="div">
-                                            {item.name}
-                                        </Typography>
-                                        <Box display="flex" alignItems="center">
-                                            <IconButton color="primary" onClick={() => addItem(item)} disabled={mySubOrder.confirmed}>
-                                                <AddCircleIcon fontSize="small" />
-                                            </IconButton>
-                                            <Typography variant="body1" fontSize={15} component="div">
-                                                {item.quantity}
-                                            </Typography>
-                                            <IconButton color="primary" onClick={() => minusItem(item)} disabled={mySubOrder.confirmed}>
-                                                <RemoveCircleIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                    </Box>
+                                {order?.subOrders?.map((subOrder) => (
+                                    <Accordion key={subOrder.owner.id}>
+                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                            <Box display="flex" alignItems="center">
+                                                <Typography variant="h5">{subOrder.owner.name}</Typography>
+                                                <Typography variant="subtitle1" ml={0.5} color="primary">
+                                                    {`${sum(subOrder.items, (x) => x.quantity)} phần - ${toLocalePrice(
+                                                        sum(subOrder.items, (x) => x.quantity * x.price)
+                                                    )}`}
+                                                </Typography>
+                                                {isHost() && (
+                                                    <IconButton color="error" onClick={() => removeTeamSubOrder(subOrder.owner.id)}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                )}
+                                            </Box>
+                                        </AccordionSummary>
+                                        <AccordionDetails sx={{ border: '1px solid gainsboro', borderTop: 'none' }}>
+                                            {subOrder.items?.map((item) => (
+                                                <Box
+                                                    key={item.name}
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    justifyContent="space-between"
+                                                    p={1}
+                                                >
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        {item.quantity} x {item.name}
+                                                    </Typography>
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        {toLocalePrice(item.quantity * item.price)}
+                                                    </Typography>
+                                                </Box>
+                                            ))}
+                                            <Divider />
+                                            <Divider />
+                                            {!!subOrder?.note && (
+                                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="red">
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        Note
+                                                    </Typography>
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        {subOrder?.note}
+                                                    </Typography>
+                                                </Box>
+                                            )}
+                                        </AccordionDetails>
+                                    </Accordion>
                                 ))}
+                            </Box>
+
+                            <Box bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
+                                <Box bgcolor="gainsboro" py={1.5}>
+                                    <Typography variant="h5" textAlign="center">
+                                        Sao kê
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        Host
+                                    </Typography>
+                                    <Typography variant="body1" fontSize={15} component="div">
+                                        {order?.host?.name}
+                                    </Typography>
+                                </Box>
                                 <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
                                     <Typography variant="h6" fontSize={15} component="div">
                                         Tổng
                                     </Typography>
                                     <Typography variant="h6" fontSize={15} component="div">
                                         {toLocalePrice(
-                                            sum(mySubOrder.items, (x) => x.quantity * x.price),
-                                            false
+                                            sum(order.subOrders, (subOrder) => sum(subOrder.items, (item) => item.price * item.quantity))
                                         )}
                                     </Typography>
                                 </Box>
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    label="Note"
-                                    disabled={mySubOrder.confirmed}
-                                    value={mySubOrder.note || ''}
-                                    onChange={(e) => {
-                                        dispatch(liveOrderActions.setMySubOrderNote(e.target.value));
-                                    }}
-                                />
-                                {mySubOrder.confirmed ? (
-                                    <Button fullWidth variant="contained" color="error" onClick={removeMySubOrder}>
-                                        Đặt lại
-                                    </Button>
-                                ) : (
+                                {isHost() && (
                                     <Button
                                         fullWidth
                                         variant="contained"
                                         color="info"
-                                        onClick={submitMySubOrder}
-                                        disabled={!mySubOrder.items.length}
+                                        onClick={handleConfirmOrder}
+                                        disabled={order?.subOrders?.length === 0}
                                     >
-                                        Xác nhận
+                                        Chốt đơn
                                     </Button>
                                 )}
                             </Box>
-                        )}
-
-                        <Box bgcolor="#f7f7f7" my={0.5}>
-                            <Box bgcolor="gainsboro" py={1.5}>
-                                <Typography variant="h5" textAlign="center">
-                                    Chi tiết
-                                </Typography>
-                            </Box>
-                            {order?.subOrders?.map((subOrder) => (
-                                <Accordion key={subOrder.owner.id}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                        <Box display="flex" alignItems="center">
-                                            <Typography variant="h5">{subOrder.owner.name}</Typography>
-                                            <Typography variant="subtitle1" ml={0.5} color="primary">
-                                                {`${sum(subOrder.items, (x) => x.quantity)} phần - ${toLocalePrice(
-                                                    sum(subOrder.items, (x) => x.quantity * x.price)
-                                                )}`}
-                                            </Typography>
-                                            {isHost() && (
-                                                <IconButton color="error" onClick={() => removeTeamSubOrder(subOrder.owner.id)}>
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            )}
-                                        </Box>
-                                    </AccordionSummary>
-                                    <AccordionDetails sx={{ border: '1px solid gainsboro', borderTop: 'none' }}>
-                                        {subOrder.items?.map((item) => (
-                                            <Box key={item.name} display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    {item.quantity} x {item.name}
-                                                </Typography>
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    {toLocalePrice(item.quantity * item.price)}
-                                                </Typography>
-                                            </Box>
-                                        ))}
-                                        <Divider />
-                                        <Divider />
-                                        {!!subOrder?.note && (
-                                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="red">
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    Note
-                                                </Typography>
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    {subOrder?.note}
-                                                </Typography>
-                                            </Box>
-                                        )}
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))}
-                        </Box>
-
-                        <Box bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
-                            <Box bgcolor="gainsboro" py={1.5}>
-                                <Typography variant="h5" textAlign="center">
-                                    Sao kê
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="body1" fontSize={15} component="div">
-                                    Host
-                                </Typography>
-                                <Typography variant="body1" fontSize={15} component="div">
-                                    {order?.host?.name}
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="h6" fontSize={15} component="div">
-                                    Tổng
-                                </Typography>
-                                <Typography variant="h6" fontSize={15} component="div">
-                                    {toLocalePrice(
-                                        sum(order.subOrders, (subOrder) => sum(subOrder.items, (item) => item.price * item.quantity))
-                                    )}
-                                </Typography>
-                            </Box>
-                            {isHost() && (
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color="info"
-                                    onClick={handleConfirmOrder}
-                                    disabled={order?.subOrders?.length === 0}
-                                >
-                                    Chốt đơn
-                                </Button>
-                            )}
-                        </Box>
-                    </Stack>
-                </Wrapper>
-            </Grid>
-        )
+                        </Stack>
+                    </Wrapper>
+                </Grid>
+            )}
+        </div>
     );
 };
 

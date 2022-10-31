@@ -21,7 +21,7 @@ const Profile = () => {
         dispatch(
             setUser({
                 ...user,
-                ...data
+                ...data,
             })
         );
         setEditMode(false);

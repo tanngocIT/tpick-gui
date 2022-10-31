@@ -97,160 +97,166 @@ const OrderDetails = () => {
         QRCode.toCanvas(document.getElementById('momo'), momoQrConfig, { width: 205, margin: 1 });
     }, [momo]);
 
-    if (!user) return null;
-
     return (
-        order && (
-            <Grid container spacing={1}>
-                <Wrapper item xs={12} lg={momo ? 9 : 12} xl={momo ? 10 : 12}>
-                    <Stack fontSize={15}>
-                        <Box item lg={6} bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
-                            <Box bgcolor="gainsboro" py={1.5}>
-                                <Typography variant="h5" textAlign="center">
-                                    Sao kê
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="body1" component="div">
-                                    Shop
-                                </Typography>
-                                <Typography variant="body1" component="div">
-                                    {shop?.name}
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="body1" component="div">
-                                    Địa chỉ
-                                </Typography>
-                                <Typography variant="body1" component="div">
-                                    {shop?.address}
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="body1" component="div">
-                                    Host
-                                </Typography>
-                                <Typography variant="body1" component="div">
-                                    {order?.host?.name}
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="body1" component="div">
-                                    Số phần
-                                </Typography>
-                                <Typography variant="body1" component="div">
-                                    {sum(groupItems, (x) => x.quantity)}
-                                </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                <Typography variant="body1" component="div" color="primary" fontWeight="bold">
-                                    Tổng
-                                </Typography>
-                                <Typography variant="body1" component="div" color="primary" fontWeight="bold">
-                                    {toLocalePrice(
-                                        sum(order.subOrders, (subOrder) => sum(subOrder.items, (item) => item.price * item.quantity))
-                                    )}
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Stack>
-                </Wrapper>
-                {momo && (
-                    <Wrapper item xs={12} lg={3} xl={2}>
-                        <Box textAlign="center">
-                            <Typography variant="h5" textAlign="center">
-                                {order?.host?.name} MoMo
-                            </Typography>
-                            <canvas id="momo" />
-                        </Box>
-                    </Wrapper>
-                )}
-                <Wrapper item xs={12} lg={6}>
-                    <Stack fontSize={15}>
-                        <Box my={0.5}>
-                            <Box bgcolor="gainsboro" py={1.5}>
-                                <Typography variant="h5" textAlign="center">
-                                    Theo phần
-                                </Typography>
-                            </Box>
-                            {groupItems.map((groupItem) => (
-                                <Box
-                                    key={`${groupItem.name}${groupItem.note}`}
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="space-between"
-                                    border="1px solid gainsboro"
-                                    p={1}
-                                >
-                                    <Stack direction="row" display="flex" alignItems="center">
-                                        <Typography variant="body" ml={0.5}>
-                                            {`${groupItem.quantity} x ${groupItem.name}`}
-                                        </Typography>
-                                        {groupItem.note && (
-                                            <Typography variant="body" ml={0.5} color="error">
-                                                {`(${groupItem.note})`}
-                                            </Typography>
-                                        )}
-                                    </Stack>
-                                    <Typography variant="body" ml={0.5} color="primary">
-                                        {`${toLocalePrice(groupItem.price * groupItem.quantity)}`}
+        <div>
+            {user && order && (
+                <Grid container spacing={1}>
+                    <Wrapper item xs={12} lg={momo ? 9 : 12} xl={momo ? 10 : 12}>
+                        <Stack fontSize={15}>
+                            <Box item lg={6} bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
+                                <Box bgcolor="gainsboro" py={1.5}>
+                                    <Typography variant="h5" textAlign="center">
+                                        Sao kê
                                     </Typography>
                                 </Box>
-                            ))}
-                        </Box>
-                    </Stack>
-                </Wrapper>
-                <Wrapper item xs={12} lg={6}>
-                    <Stack>
-                        <Box bgcolor="#f7f7f7" my={0.5}>
-                            <Box bgcolor="gainsboro" py={1.5}>
-                                <Typography variant="h5" textAlign="center">
-                                    Theo người
-                                </Typography>
-                            </Box>
-                            {order.subOrders?.map((subOrder) => (
-                                <Accordion key={subOrder.owner.id}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                        <Box display="flex" alignItems="center">
-                                            <Typography variant="h5">{subOrder.owner.name}</Typography>
-                                            <Typography variant="subtitle1" ml={0.5} color="primary">
-                                                {`(${sum(subOrder.items, (x) => x.quantity)}P - ${toLocalePrice(
-                                                    sum(subOrder.items, (x) => x.quantity * x.price)
-                                                )})`}
-                                            </Typography>
-                                        </Box>
-                                    </AccordionSummary>
-                                    <AccordionDetails sx={{ border: '1px solid gainsboro', borderTop: 'none' }}>
-                                        {subOrder.items?.map((item) => (
-                                            <Box key={item.name} display="flex" alignItems="center" justifyContent="space-between" p={1}>
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    {item.quantity} x {item.name}
-                                                </Typography>
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    {toLocalePrice(item.quantity * item.price)}
-                                                </Typography>
-                                            </Box>
-                                        ))}
-                                        <Divider />
-                                        <Divider />
-                                        {!!subOrder?.note && (
-                                            <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="red">
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    Note
-                                                </Typography>
-                                                <Typography variant="body1" fontSize={15} component="div">
-                                                    {subOrder?.note}
-                                                </Typography>
-                                            </Box>
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                    <Typography variant="body1" component="div">
+                                        Shop
+                                    </Typography>
+                                    <Typography variant="body1" component="div">
+                                        {shop?.name}
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                    <Typography variant="body1" component="div">
+                                        Địa chỉ
+                                    </Typography>
+                                    <Typography variant="body1" component="div">
+                                        {shop?.address}
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                    <Typography variant="body1" component="div">
+                                        Host
+                                    </Typography>
+                                    <Typography variant="body1" component="div">
+                                        {order?.host?.name}
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                    <Typography variant="body1" component="div">
+                                        Số phần
+                                    </Typography>
+                                    <Typography variant="body1" component="div">
+                                        {sum(groupItems, (x) => x.quantity)}
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1}>
+                                    <Typography variant="body1" component="div" color="primary" fontWeight="bold">
+                                        Tổng
+                                    </Typography>
+                                    <Typography variant="body1" component="div" color="primary" fontWeight="bold">
+                                        {toLocalePrice(
+                                            sum(order.subOrders, (subOrder) => sum(subOrder.items, (item) => item.price * item.quantity))
                                         )}
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))}
-                        </Box>
-                    </Stack>
-                </Wrapper>
-            </Grid>
-        )
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Stack>
+                    </Wrapper>
+                    {momo && (
+                        <Wrapper item xs={12} lg={3} xl={2}>
+                            <Box textAlign="center">
+                                <Typography variant="h5" textAlign="center">
+                                    {order?.host?.name} MoMo
+                                </Typography>
+                                <canvas id="momo" />
+                            </Box>
+                        </Wrapper>
+                    )}
+                    <Wrapper item xs={12} lg={6}>
+                        <Stack fontSize={15}>
+                            <Box my={0.5}>
+                                <Box bgcolor="gainsboro" py={1.5}>
+                                    <Typography variant="h5" textAlign="center">
+                                        Theo phần
+                                    </Typography>
+                                </Box>
+                                {groupItems.map((groupItem) => (
+                                    <Box
+                                        key={`${groupItem.name}${groupItem.note}`}
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                        border="1px solid gainsboro"
+                                        p={1}
+                                    >
+                                        <Stack direction="row" display="flex" alignItems="center">
+                                            <Typography variant="body" ml={0.5}>
+                                                {`${groupItem.quantity} x ${groupItem.name}`}
+                                            </Typography>
+                                            {groupItem.note && (
+                                                <Typography variant="body" ml={0.5} color="error">
+                                                    {`(${groupItem.note})`}
+                                                </Typography>
+                                            )}
+                                        </Stack>
+                                        <Typography variant="body" ml={0.5} color="primary">
+                                            {`${toLocalePrice(groupItem.price * groupItem.quantity)}`}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Stack>
+                    </Wrapper>
+                    <Wrapper item xs={12} lg={6}>
+                        <Stack>
+                            <Box bgcolor="#f7f7f7" my={0.5}>
+                                <Box bgcolor="gainsboro" py={1.5}>
+                                    <Typography variant="h5" textAlign="center">
+                                        Theo người
+                                    </Typography>
+                                </Box>
+                                {order.subOrders?.map((subOrder) => (
+                                    <Accordion key={subOrder.owner.id}>
+                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                            <Box display="flex" alignItems="center">
+                                                <Typography variant="h5">{subOrder.owner.name}</Typography>
+                                                <Typography variant="subtitle1" ml={0.5} color="primary">
+                                                    {`(${sum(subOrder.items, (x) => x.quantity)}P - ${toLocalePrice(
+                                                        sum(subOrder.items, (x) => x.quantity * x.price)
+                                                    )})`}
+                                                </Typography>
+                                            </Box>
+                                        </AccordionSummary>
+                                        <AccordionDetails sx={{ border: '1px solid gainsboro', borderTop: 'none' }}>
+                                            {subOrder.items?.map((item) => (
+                                                <Box
+                                                    key={item.name}
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    justifyContent="space-between"
+                                                    p={1}
+                                                >
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        {item.quantity} x {item.name}
+                                                    </Typography>
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        {toLocalePrice(item.quantity * item.price)}
+                                                    </Typography>
+                                                </Box>
+                                            ))}
+                                            <Divider />
+                                            <Divider />
+                                            {!!subOrder?.note && (
+                                                <Box display="flex" alignItems="center" justifyContent="space-between" p={1} color="red">
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        Note
+                                                    </Typography>
+                                                    <Typography variant="body1" fontSize={15} component="div">
+                                                        {subOrder?.note}
+                                                    </Typography>
+                                                </Box>
+                                            )}
+                                        </AccordionDetails>
+                                    </Accordion>
+                                ))}
+                            </Box>
+                        </Stack>
+                    </Wrapper>
+                </Grid>
+            )}
+        </div>
     );
 };
 
