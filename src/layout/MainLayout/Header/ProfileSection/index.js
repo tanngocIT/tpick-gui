@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useAuth0 } from '@auth0/auth0-react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -37,20 +36,17 @@ const ProfileSection = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const theme = useTheme();
-    const { logout } = useAuth0();
     const customization = useSelector((state) => state.customization);
     const user = useSelector((state) => state?.auth?.user);
 
     const [open, setOpen] = useState(false);
     /**
-     * anchorRef is used on different componets and specifying one type leads to other components throwing an error
+     * anchorRef is used on different components and specifying one type leads to other components throwing an error
      * */
     const anchorRef = useRef(null);
 
     const handleLogout = async () => {
-        logout({
-            returnTo: window.location.origin
-        });
+
         dispatch(clearUser());
     };
 

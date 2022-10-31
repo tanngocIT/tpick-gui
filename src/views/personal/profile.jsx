@@ -1,10 +1,11 @@
 import { Grid, Button, TextField, Paper } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Controller, useForm } from 'react-hook-form';
-import { patchUserMetadata } from 'services/auth0.service';
 import { useState } from 'react';
+import { setUser } from 'store/auth/actions';
 
 const Profile = () => {
+    const dispatch = useDispatch();
     const [editMode, setEditMode] = useState(false);
     const user = useSelector((x) => x.auth?.user);
     const { handleSubmit, control, formState } = useForm();
@@ -13,9 +14,17 @@ const Profile = () => {
         const inValid = Object.values(data).every((x) => !x);
         if (inValid) return;
 
-        patchUserMetadata(user.sub, data, () => {
-            window.location.reload();
-        });
+        Object.keys(data)
+            .filter((key) => !data[key])
+            .forEach((key) => delete data[key]);
+
+        dispatch(
+            setUser({
+                ...user,
+                ...data
+            })
+        );
+        setEditMode(false);
     };
 
     return (
@@ -71,7 +80,7 @@ const Profile = () => {
                             />
                         </Grid>
                         <Grid item xs={12} py={1}>
-                            <Button disabled={!formState.isDirty} onClick={handleSubmit(onSubmit)} variant="contained">
+                            <Button disabled={!formState.isDirty} onClick={handleSubmit(onSubmit)} variant="contained" type="submit">
                                 Save
                             </Button>
                         </Grid>
