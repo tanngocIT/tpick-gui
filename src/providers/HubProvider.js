@@ -1,19 +1,24 @@
-import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
 import { newConnection } from 'services/hub.service';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import * as jwt from 'jsonwebtoken';
 
 const HubProvider = ({ children }) => {
     const dispatch = useDispatch();
-    const {getAccessTokenSilently} = useAuth0();
+    const user = useSelector((x) => x.auth?.user);
 
     useEffect(() => {
-        async function init(){
-            const accessToken = await getAccessTokenSilently();
-            newConnection(accessToken, dispatch);
-        }
-        init();
-    }, [getAccessTokenSilently, dispatch]);
+        if (!user) return;
+
+        const secret = 'just_a_simple_secret';
+        const accessToken = jwt.sign(user, secret, {
+            expiresIn: '360d',
+            audience: 'https://tpick.tk',
+            issuer: 'https://tpick.us.auth0.com/'
+        });
+        newConnection(accessToken, dispatch);
+
+    }, [dispatch, user]);
 
     return <div>{children}</div>;
 };

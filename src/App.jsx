@@ -10,7 +10,7 @@ import themes from 'themes';
 
 // project imports
 import NavigationScroll from 'layout/NavigationScroll';
-import CustomAuth0Provider from 'providers/CustomAuth0Provider';
+import SimpleAuthProvider from 'providers/SimpleAuthProvider';
 import HubProvider from 'providers/HubProvider';
 import HelperProvider from 'providers/HelperProvider';
 
@@ -23,14 +23,13 @@ const App = () => {
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={themes(customization)}>
                 <HelperProvider>
-                    <CustomAuth0Provider>
-                        <HubProvider>
-                            <CssBaseline />
-                            <NavigationScroll>
-                                <Routes />
-                            </NavigationScroll>
-                        </HubProvider>
-                    </CustomAuth0Provider>
+                    <SimpleAuthProvider />
+                    <HubProvider>
+                        <CssBaseline />
+                        <NavigationScroll>
+                            <Routes />
+                        </NavigationScroll>
+                    </HubProvider>
                 </HelperProvider>
             </ThemeProvider>
         </StyledEngineProvider>

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from 'store/auth/actions';
 import { v4 as uuid } from 'uuid';
 import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
 const style = {
     position: 'absolute',
@@ -20,11 +21,11 @@ const style = {
     p: 4
 };
 
-const AuthProvider = () => {
+const SimpleAuthProvider = () => {
     const dispatch = useDispatch();
     const user = useSelector((x) => x.auth?.user);
-    const [name, setName] = React.useState('');
     const [open, setOpen] = React.useState(false);
+    const { handleSubmit, control } = useForm();
 
     useEffect(() => {
         if (user) {
@@ -40,8 +41,7 @@ const AuthProvider = () => {
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = ({ name }) => {
         if (!name) return;
 
         const user = {
@@ -54,16 +54,23 @@ const AuthProvider = () => {
     return (
         <div>
             <Modal open={open} onClose={handleClose}>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <Paper sx={style}>
                         <Stack>
-                            <TextField
-                                variant="outlined"
-                                autoComplete="off"
-                                label="Tên"
-                                placeholder="Nhập tên của bạn"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                            <Controller
+                                name="name"
+                                control={control}
+                                render={({ field: { onChange, value } }) => (
+                                    <TextField
+                                        autoFocus
+                                        variant="outlined"
+                                        autoComplete="off"
+                                        label="Tên"
+                                        placeholder="Nhập tên của bạn"
+                                        onChange={onChange}
+                                        value={value}
+                                    />
+                                )}
                             />
                             <br />
                             <Button variant="contained" type="submit">
@@ -77,4 +84,4 @@ const AuthProvider = () => {
     );
 };
 
-export default AuthProvider;
+export default SimpleAuthProvider;
