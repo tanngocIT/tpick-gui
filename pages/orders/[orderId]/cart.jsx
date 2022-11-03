@@ -190,6 +190,7 @@ const OrderCart = ({seo}) => {
     }, [router, dispatch, orderId, order?.isConfirm]);
 
     useEffect(() => {
+        if (!orderId) return;
         if (!lastRefreshed) return;
 
         dispatch(liveOrderActions.getLiveOrder(orderId));
