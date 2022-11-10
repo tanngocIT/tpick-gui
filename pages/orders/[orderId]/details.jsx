@@ -16,6 +16,34 @@ import { sum, toLocalePrice } from 'utils/pricing-tool';
 import * as liveOrderActions from 'store/liveOrder/actions';
 import QRCode from 'qrcode';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
+import * as mainService from 'services/main.service';
+
+export async function getServerSideProps(context) {
+    const { orderId } = context.query;
+    if (!orderId) {
+        return {
+            props: {}
+        };
+    }
+
+    const order = await mainService.getOrderDetails(orderId);
+    const shop = await mainService.getShopDetails(order.shopId);
+
+    const title = `${shop.name} | TPick | ${order?.host?.name}`;
+    const description = `Cùng đặt nhóm thông qua TPick nào!`;
+    const image = shop.imageUrl || "https://tpick.netlify.app/og.jpg";
+
+    return {
+        props: {
+            seo: {
+                title,
+                description,
+                image
+            }
+        }
+    };
+}
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -44,7 +72,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
     borderRadius: 0
 }));
 
-const OrderDetails = () => {
+const OrderDetails = ({seo}) => {
     const router = useRouter();
     const dispatch = useDispatch();
     const { orderId } = router.query;
@@ -99,6 +127,17 @@ const OrderDetails = () => {
 
     return (
         <div>
+                        {seo && (
+                <Head>
+                    <title>{seo.title}</title>
+                    <meta property="title" content={seo.title} />
+                    <meta property="description" content={seo.description} />
+                    <meta property="og:title" content={seo.title} />
+                    <meta property="og:description" content={seo.description} />
+                    <meta property="og:image" content={seo.image} />
+                    <meta property="og:type" content="website" />
+                </Head>
+            )}
             {user && order && (
                 <Grid container spacing={1}>
                     <Wrapper item xs={12} lg={momo ? 9 : 12} xl={momo ? 10 : 12}>
