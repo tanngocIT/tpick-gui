@@ -11,14 +11,34 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RevertIcon from '@mui/icons-material/RestartAlt';
+import SaveIcon from '@mui/icons-material/Save';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
 import * as liveOrderActions from 'store/liveOrder/actions';
 import QRCode from 'qrcode';
 import { useConfirm } from 'material-ui-confirm';
+import * as gSheetService from 'services/gsheet.service';
+import { useSnackbar } from 'notistack';
+import RefreshIcon from '@mui/icons-material/Refresh';
+
+const SpinIcon = () => (
+    <RefreshIcon
+        sx={{
+            animation: 'spin 2s linear infinite',
+            '@keyframes spin': {
+                '0%': {
+                    transform: 'rotate(0deg)'
+                },
+                '100%': {
+                    transform: 'rotate(360deg)'
+                }
+            }
+        }}
+    />
+);
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -55,7 +75,10 @@ const OrderDetails = () => {
     const user = useSelector((x) => x.auth?.user);
     const shop = useSelector((x) => x.liveOrder.shop);
     const order = useSelector((x) => x.liveOrder.order);
+    const [gSheetProcessing, setGSheetProcessing] = useState(false);
     const momo = order?.host?.momo;
+    const { enqueueSnackbar } = useSnackbar();
+
     const groupItemMap = order?.subOrders
         .map((subOrder) => subOrder.items.map((item) => ({ ...item, note: subOrder.note })))
         .flatMap((items) => items)
@@ -97,6 +120,21 @@ const OrderDetails = () => {
         dispatch(liveOrderActions.revertLiveOrder());
     }, [order, confirm, isHost, dispatch]);
 
+    const handleSaveGoogleSheet = useCallback(async () => {
+        if (!isHost()) return;
+        if (order.subOrders.length === 0) return;
+
+        try {
+            await confirm({
+                title: `Lưu vào google sheet?`
+            });
+        } catch (error) {
+            return;
+        }
+
+        await gSheetService.writeToGoogleSheet(enqueueSnackbar, setGSheetProcessing, user?.sheetId, order, shop);
+    }, [enqueueSnackbar, order, confirm, isHost, shop, user?.sheetId]);
+
     useEffect(() => {
         if (!user?.id) return;
 
@@ -132,11 +170,34 @@ const OrderDetails = () => {
             <Grid container spacing={1}>
                 {isHost() && (
                     <Wrapper item xs={12}>
-                        <Button fullWidth variant="contained" color="error" startIcon={<RevertIcon />} onClick={handleRevertOrder}>
-                            Chỉnh sửa đơn
-                        </Button>
+                        <Box bgcolor="gainsboro" py={1.5}>
+                            <Typography variant="h5" textAlign="center">
+                                Tác vụ
+                            </Typography>
+                        </Box>
+                        <Box pt={1}>
+                            <Button fullWidth variant="contained" color="error" startIcon={<RevertIcon />} onClick={handleRevertOrder}>
+                                Hoàn tác đơn
+                            </Button>
+                        </Box>
+
+                        {user.premium === true && user.sheetId && (
+                            <Box pt={1}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    color="success"
+                                    startIcon={gSheetProcessing ? <SpinIcon /> : <SaveIcon />}
+                                    disabled={gSheetProcessing}
+                                    onClick={handleSaveGoogleSheet}
+                                >
+                                    Lưu google sheet
+                                </Button>
+                            </Box>
+                        )}
                     </Wrapper>
                 )}
+
                 <Wrapper item xs={12} lg={momo ? 9 : 12} xl={momo ? 10 : 12}>
                     <Stack fontSize={15}>
                         <Box item lg={6} bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
