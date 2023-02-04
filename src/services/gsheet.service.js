@@ -5,7 +5,8 @@ const writeToGoogleSheetPrivate = async (sheetId, order, shop) => {
     const doc = new GoogleSpreadsheet(sheetId);
     doc.useServiceAccountAuth({
         client_email: 'google-sheet@tpick-vn.iam.gserviceaccount.com',
-        private_key: process.env.REACT_APP_GSHEET_KEY.replace(/\\n/g, '\n')
+        // private_key: process.env.REACT_APP_GSHEET_KEY.replace(/\\n/g, '\n'),
+        private_key: Buffer.from(process.env.REACT_APP_GSHEET_KEY, 'base64').toString('ascii')
     });
     await doc.loadInfo();
     const sheet = doc.sheetsByTitle.RawOrderDetails;
