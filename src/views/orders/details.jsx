@@ -80,7 +80,7 @@ const OrderDetails = () => {
     const groupItems = Object.values(groupItemMap)?.sort((a, b) => a.name.localeCompare(b.name));
     const lastRefreshed = useSelector((x) => x.liveOrder.lastRefreshed);
 
-    const isHost = useCallback(() => user.id === order.host?.id, [user.id, order.host?.id]);
+    const isHost = useCallback(() => user?.id && user?.id === order.host?.id, [user?.id, order.host?.id]);
 
     const handleRevertOrder = useCallback(async () => {
         if (!isHost()) return;
@@ -94,7 +94,7 @@ const OrderDetails = () => {
             return;
         }
 
-        dispatch(liveOrderActions.confirmLiveOrder());
+        dispatch(liveOrderActions.revertLiveOrder());
     }, [order, confirm, isHost, dispatch]);
 
     useEffect(() => {

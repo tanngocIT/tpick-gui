@@ -69,7 +69,7 @@ const OrderCart = () => {
     const lastRefreshed = useSelector((x) => x.liveOrder.lastRefreshed);
     const [filteredShopSections, setFilteredShopSections] = useState([]);
 
-    const isHost = () => user.id === order.host?.id;
+    const isHost = useCallback(() => user?.id && user?.id === order.host?.id, [user?.id, order.host?.id]);
 
     const addItem = (item) => {
         dispatch(liveOrderActions.addItemToSubOrder(item));
