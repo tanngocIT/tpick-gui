@@ -9,6 +9,8 @@ export const INIT_MY_SUB_ORDER = '@liveOrder/INIT_MY_SUB_ORDER';
 export const INIT_MY_SUB_ORDER_SUCCESS = '@liveOrder/INIT_MY_SUB_ORDER_SUCCESS';
 export const CONFIRM_LIVE_ORDER = '@liveOrder/CONFIRM_LIVE_ORDER';
 export const CONFIRM_LIVE_ORDER_SUCCESS = '@liveOrder/CONFIRM_LIVE_ORDER_SUCCESS';
+export const REVERT_LIVE_ORDER = '@liveOrder/REVERT_LIVE_ORDER';
+export const REVERT_LIVE_ORDER_SUCCESS = '@liveOrder/REVERT_LIVE_ORDER_SUCCESS';
 export const ADD_ITEM_TO_SUB_ORDER = '@liveOrder/ADD_ITEM_TO_SUB_ORDER';
 export const ADD_ITEM_TO_SUB_ORDER_SUCCESS = '@liveOrder/ADD_ITEM_TO_SUB_ORDER_SUCCESS';
 export const MINUS_ITEM_FROM_SUB_ORDER = '@liveOrder/MINUS_ITEM_FROM_SUB_ORDER';
@@ -30,6 +32,7 @@ export const noticeOrderRefreshedSuccess = createAction(NOTICE_ORDER_REFRESHED_S
     payload: { lastRefreshed }
 }));
 export const confirmLiveOrder = createAction(CONFIRM_LIVE_ORDER);
+export const revertLiveOrder = createAction(REVERT_LIVE_ORDER);
 export const submitSubOrder = createAction(SUBMIT_SUB_ORDER);
 export const submitSubOrderSuccess = createAction(SUBMIT_SUB_ORDER_SUCCESS);
 export const removeSubOrder = createAction(REMOVE_SUB_ORDER, (ownerId) => ({ payload: { ownerId } }));

@@ -28,6 +28,13 @@ export const confirmOrder = async (orderId) => {
     throw new Error('Something went wrong!');
 };
 
+export const revertOrder = async (orderId) => {
+    const { status, data } = await patch(`/orders/${orderId}/revert-confirmation`);
+    if (is2xxCode(status)) return data;
+
+    throw new Error('Something went wrong!');
+};
+
 export const getOrderDetails = async (id) => {
     const { status, data } = await get(`/orders/${id}`);
     if (is2xxCode(status)) return data;

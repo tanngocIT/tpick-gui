@@ -98,6 +98,11 @@ function* confirmLiveOrderHandler() {
     yield call(mainService.confirmOrder, order.id);
 }
 
+function* revertLiveOrderHandler() {
+    const { order } = yield select((x) => x.liveOrder);
+    yield call(mainService.revertOrder, order.id);
+}
+
 export function* sagas() {
     yield takeLatest(actions.getLiveOrder, getLiveOrderHandler);
     yield takeLatest(actions.getLiveShop, getLiveShopHandler);
@@ -107,4 +112,5 @@ export function* sagas() {
     yield takeLatest(actions.submitSubOrder, submitSubOrderHandler);
     yield takeLatest(actions.removeSubOrder, removeSubOrderHandler);
     yield takeLatest(actions.confirmLiveOrder, confirmLiveOrderHandler);
+    yield takeLatest(actions.revertLiveOrder, revertLiveOrderHandler);
 }

@@ -4,18 +4,21 @@ import {
     Stack,
     Typography,
     Divider,
+    Button,
     Accordion as MuiAccordion,
     AccordionSummary as MuiAccordionSummary,
     AccordionDetails as MuiAccordionDetails
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import RevertIcon from '@mui/icons-material/RestartAlt';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { sum, toLocalePrice } from 'utils/pricing-tool';
 import * as liveOrderActions from 'store/liveOrder/actions';
 import QRCode from 'qrcode';
+import { useConfirm } from 'material-ui-confirm';
 
 const Wrapper = ({ children, ...rest }) => (
     <Grid {...rest}>
@@ -47,6 +50,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(() => ({
 const OrderDetails = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const confirm = useConfirm();
     const { orderId } = useParams();
     const user = useSelector((x) => x.auth?.user);
     const shop = useSelector((x) => x.liveOrder.shop);
@@ -74,6 +78,24 @@ const OrderDetails = () => {
             return acc;
         }, {});
     const groupItems = Object.values(groupItemMap)?.sort((a, b) => a.name.localeCompare(b.name));
+    const lastRefreshed = useSelector((x) => x.liveOrder.lastRefreshed);
+
+    const isHost = useCallback(() => user.id === order.host?.id, [user.id, order.host?.id]);
+
+    const handleRevertOrder = useCallback(async () => {
+        if (!isHost()) return;
+        if (order.subOrders.length === 0) return;
+
+        try {
+            await confirm({
+                title: `Chỉnh sửa đơn hàng?`
+            });
+        } catch (error) {
+            return;
+        }
+
+        dispatch(liveOrderActions.confirmLiveOrder());
+    }, [order, confirm, isHost, dispatch]);
 
     useEffect(() => {
         if (!user?.id) return;
@@ -90,6 +112,12 @@ const OrderDetails = () => {
     }, [navigate, dispatch, orderId, order?.isConfirm]);
 
     useEffect(() => {
+        if (!lastRefreshed) return;
+
+        dispatch(liveOrderActions.getLiveOrder(orderId));
+    }, [dispatch, orderId, lastRefreshed]);
+
+    useEffect(() => {
         if (!momo) return;
 
         const momoQrConfig = `2|99|${momo}|NAME|MAIL|0|0|0||transfer_myqr`;
@@ -102,6 +130,13 @@ const OrderDetails = () => {
     return (
         order && (
             <Grid container spacing={1}>
+                {isHost() && (
+                    <Wrapper item xs={12}>
+                        <Button fullWidth variant="contained" color="error" startIcon={<RevertIcon />} onClick={handleRevertOrder}>
+                            Chỉnh sửa đơn
+                        </Button>
+                    </Wrapper>
+                )}
                 <Wrapper item xs={12} lg={momo ? 9 : 12} xl={momo ? 10 : 12}>
                     <Stack fontSize={15}>
                         <Box item lg={6} bgcolor="#f7f7f7" borderRadius={0} my={0.5}>
