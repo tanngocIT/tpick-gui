@@ -156,7 +156,7 @@ const OrderCart = () => {
 
     useEffect(() => {
         if (!orderId) return;
-        if (order.isConfirm) {
+        if (order.isConfirm === true) {
             navigate(`/orders/${orderId}/details`);
             dispatch(liveOrderActions.resetLiveOrderSuccess());
         }

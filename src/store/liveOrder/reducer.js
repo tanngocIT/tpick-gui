@@ -18,6 +18,12 @@ const liveOrderReducer = createReducer(initState, {
     [actionTypes.NOTICE_ORDER_REFRESHED_SUCCESS]: (state, action) => {
         state.lastRefreshed = action.payload.lastRefreshed;
     },
+    [actionTypes.CONFIRM_LIVE_ORDER_SUCCESS]: (state) => {
+        state.order.isConfirm = true;
+    },
+    [actionTypes.REVERT_LIVE_ORDER_SUCCESS]: (state) => {
+        state.order.isConfirm = false;
+    },
     [actionTypes.ADD_ITEM_TO_SUB_ORDER_SUCCESS]: (state, action) => {
         const { mySubOrder } = state;
         const { item } = action.payload;

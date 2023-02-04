@@ -14,7 +14,7 @@ function* getLiveOrderHandler({ payload }) {
     yield put(actions.getLiveOrderSuccess(order));
 
     const { shop } = yield select((x) => x.liveOrder);
-    if (!shop.id){
+    if (!shop.id) {
         yield put(actions.getLiveShop(order.shopId));
     }
 
@@ -96,11 +96,13 @@ function* removeSubOrderHandler({ payload }) {
 function* confirmLiveOrderHandler() {
     const { order } = yield select((x) => x.liveOrder);
     yield call(mainService.confirmOrder, order.id);
+    yield put(actions.confirmLiveOrderSuccess());
 }
 
 function* revertLiveOrderHandler() {
     const { order } = yield select((x) => x.liveOrder);
     yield call(mainService.revertOrder, order.id);
+    yield put(actions.revertLiveOrderSuccess());
 }
 
 export function* sagas() {

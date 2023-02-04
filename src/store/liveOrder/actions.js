@@ -32,7 +32,9 @@ export const noticeOrderRefreshedSuccess = createAction(NOTICE_ORDER_REFRESHED_S
     payload: { lastRefreshed }
 }));
 export const confirmLiveOrder = createAction(CONFIRM_LIVE_ORDER);
+export const confirmLiveOrderSuccess = createAction(CONFIRM_LIVE_ORDER_SUCCESS);
 export const revertLiveOrder = createAction(REVERT_LIVE_ORDER);
+export const revertLiveOrderSuccess = createAction(REVERT_LIVE_ORDER_SUCCESS);
 export const submitSubOrder = createAction(SUBMIT_SUB_ORDER);
 export const submitSubOrderSuccess = createAction(SUBMIT_SUB_ORDER_SUCCESS);
 export const removeSubOrder = createAction(REMOVE_SUB_ORDER, (ownerId) => ({ payload: { ownerId } }));
