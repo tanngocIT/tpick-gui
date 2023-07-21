@@ -58,7 +58,7 @@ const OrderInit = () => {
                 <Grid m={1} p={1}>
                     <Grid item xs={12} py={1}>
                         <Typography textAlign="center" variant="h3" fontSize={20} component="h1" color="primary">
-                            Chào mừng đến với TPick, nhập đường dẫn ShopeeFood để bắt đầu đặt nhóm!
+                            Chào mừng đến với TPick, nhập đường dẫn ShopeeFood/Grab để bắt đầu đặt nhóm!
                         </Typography>
                     </Grid>
                     <Grid item xs={12} py={1}>
