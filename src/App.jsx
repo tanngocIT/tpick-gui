@@ -13,6 +13,7 @@ import NavigationScroll from 'layout/NavigationScroll';
 import SimpleAuthProvider from 'providers/SimpleAuthProvider';
 import HubProvider from 'providers/HubProvider';
 import HelperProvider from 'providers/HelperProvider';
+import NewVersionProvider from 'providers/NewVersionProvider';
 
 // ==============================|| APP ||============================== //
 
@@ -22,8 +23,8 @@ const App = () => {
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={themes(customization)}>
+                <NewVersionProvider />
                 <HelperProvider>
-                    <SimpleAuthProvider />
                     <HubProvider>
                         <CssBaseline />
                         <NavigationScroll>
